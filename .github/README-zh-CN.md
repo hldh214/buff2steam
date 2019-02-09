@@ -2,6 +2,8 @@
 
 > 其實世界上根本就沒有代购, 也可以說人人都是代购, 不管大妹小妹叔叔阿姨, 只要有心, 人人都可以是代购
 
+![head_image](https://camo.githubusercontent.com/3975b56885321eeafd5e0b8ab6ecde3a803e397c/687474703a2f2f696d677372632e62616964752e636f6d2f666f72756d2f7069632f6974656d2f316533633236663430616431363264396635616663656330316364666139656338623133636435392e6a7067)
+
 ## 简介
 
 buff2steam 是一个爬虫脚本, 用于爬取 [网易buff](https://buff.163.com/) 上售价低于 [steam 社区市场](https://steamcommunity.com/market/) 上的饰品
@@ -61,4 +63,6 @@ steam_api_sleep = 30
 python3 main.py
 ```
 
+## License
 
+buff2steam is open-source software licensed under the Unlicense License. See the LICENSE file for more information.
