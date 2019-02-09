@@ -7,7 +7,9 @@
 ## 简介
 
 buff2steam 是一个爬虫脚本, 用于爬取 [网易buff](https://buff.163.com/) 上售价低于 [steam 社区市场](https://steamcommunity.com/market/) 上的饰品
+
 设置差价阈值后, 脚本会自动计算差价并筛选出符合的饰品
+
 手动从 buff 购入并上架到 steam 出售从而赚取 steam 钱包余额
 
 ## 先决条件
