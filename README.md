@@ -2,6 +2,8 @@
 
 > make money from buff.163.com
 
+[简体中文](.github/README-zh-CN.md)
+
 ## Table of Contents
 
 - [requirements](#requirements)
