@@ -8,6 +8,9 @@ from json.decoder import JSONDecodeError
 from termcolor import cprint
 
 buff_session = 'YOUR BUFF SESSION HERE'
+proxies = {
+    'https': 'http://127.0.0.1:1080'
+}
 visited_ids = set()
 buff_id_blacklist = (3986,)
 buff_type_blacklist = ('tool',)
@@ -82,7 +85,7 @@ try:
                 res = requests.get(steam_api.format(market_hash_name), params={
                     'count': 1,
                     'currency': currency,
-                })
+                }, proxies=proxies)
 
                 if res.status_code == 429:
                     cprint('steam_api_429', 'magenta')
@@ -100,13 +103,17 @@ try:
                 steam_price = Decimal(listinginfo['converted_price'])
                 steam_tax_ratio = steam_price / (steam_price + Decimal(listinginfo['converted_fee']))
 
-                item_nameid = item_nameid_pattern.findall(requests.get(item['steam_market_url']).text)
+                item_nameid = item_nameid_pattern.findall(requests.get(
+                    item['steam_market_url'], proxies=proxies
+                ).text)
 
                 if not item_nameid:
                     continue
 
                 item_nameid = item_nameid[0]
-                orders_data = requests.get(steam_order_api.format(item_nameid)).json()
+                orders_data = requests.get(
+                    steam_order_api.format(item_nameid), proxies=proxies
+                ).json()
 
                 if 'highest_buy_order' not in orders_data:
                     continue
@@ -124,11 +131,12 @@ try:
                 if highest_buy_order_ratio > 1:
                     continue
 
+                # sold in 24h
                 steam_price_overview = requests.get(steam_price_overview_api, params={
                     'appid': game_appid,
                     'currency': currency,
                     'market_hash_name': market_hash_name
-                }).json()
+                }, proxies=proxies).json()
 
                 if 'volume' not in steam_price_overview:
                     continue
