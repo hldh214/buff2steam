@@ -8,7 +8,17 @@
 
 buff2steam 是一个爬虫脚本, 用于爬取 [网易buff](https://buff.163.com/) 上售价低于 [steam 社区市场](https://steamcommunity.com/market/) 上的饰品
 
-设置差价阈值后, 脚本会自动计算差价并筛选出符合的饰品
+设置差价阈值后, 脚本会自动计算差价并筛选出符合的饰品, 如上图
+
+ - id 表示此物品 https://buff.163.com/market/goods?goods_id=2334 里面的 goods_id
+ - s_cnt 表示此物品在 steam 社区市场上的出售单数量
+ - w_cnt 表示此物品在 steam 社区市场上的订购单数量
+ - volume 表示此物品在 steam 社区市场上 24h 内的销量
+ - buff_price 表示此物品在 buff 上的最低售价
+ - b_o_ratio 表示此物品在 steam 社区市场**立即**出售给最高出价的订购单所获得的余额折扣(扣除手续费后)
+ - ratio 表示此物品在 steam 社区市场竞价出售**可能**获得的最低余额折扣(扣除手续费后)
+
+最后面这两个 ratio 就是上述的差价阈值, 这个值越低越好, 越低表示你通过这笔交易获得了这个折扣的 steam 钱包余额
 
 手动从 buff 购入并上架到 steam 出售从而赚取 steam 钱包余额
 
@@ -26,9 +36,20 @@ pip install -r requirements.txt
 
 ## 配置
 
+### 获取 buff session
+
+![session](https://camo.githubusercontent.com/89f04601687e404b342402eb59ac97b148a91bb8/68747470733a2f2f7773332e73696e61696d672e636e2f6c617267652f30303542597170676c793167303036717933356e616a3331367a3070743432742e6a7067)
+如图: Chrome 浏览器 -> F12 -> Network选项卡 -> 刷新网页 -> Doc筛选 -> Response Headers 部分
+蓝色框框里面就是我们需要的session
+
 ```python
 # [必填]填你的 buff 网页 session
 buff_session = 'session=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+
+# [必填]代理 ip, 如果使用 SS Windows 客户端并且是默认配置, 则此项可保持默认, 若不需要代理则可注释掉
+proxies = {
+    'https': 'http://127.0.0.1:1080'
+}
 
 # [可保持默认]buff id 黑名单
 buff_id_blacklist = (3986,)
