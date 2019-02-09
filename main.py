@@ -11,7 +11,6 @@ buff_session = 'YOUR BUFF SESSION HERE'
 proxies = {
     'https': 'http://127.0.0.1:1080'
 }
-visited_ids = set()
 buff_id_blacklist = (3986,)
 buff_type_blacklist = ('tool',)
 game = 'dota2'
@@ -24,6 +23,8 @@ min_price = 1000
 max_price = 30000
 # steam api request interval
 steam_api_sleep = 30
+
+visited_ids = set()
 
 steam_api = 'https://steamcommunity.com/market/listings/' + game_appid + '/{0}/render'
 steam_order_api = 'https://steamcommunity.com/market/itemordershistogram?language=schinese&currency=23&item_nameid={0}'
