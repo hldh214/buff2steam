@@ -116,7 +116,7 @@ try:
                     steam_order_api.format(item_nameid), proxies=proxies
                 ).json()
 
-                if 'highest_buy_order' not in orders_data:
+                if 'highest_buy_order' not in orders_data or not orders_data['highest_buy_order']:
                     continue
 
                 highest_buy_order = Decimal(orders_data['highest_buy_order'])
