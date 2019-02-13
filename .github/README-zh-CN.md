@@ -59,7 +59,7 @@ pip install -r requirements.txt
 # [必填]填你的 buff 网页 session
 buff_session = 'session=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 
-# [必填]代理 ip, 如果使用 SS Windows 客户端并且是默认配置, 则此项可保持默认, 若不需要代理则可注释掉
+# [必填]代理 ip, 如果使用 SS Windows 客户端并且是默认配置, 则此项可保持默认, 若不需要代理则可去掉
 proxies = {
     'https': 'http://127.0.0.1:1080'
 }

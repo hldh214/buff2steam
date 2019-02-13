@@ -1,0 +1,33 @@
+{
+    "main": {
+        "game": "dota2",
+        "game_appid": 570,
+        "accept_buff_threshold": 0.65,
+        "highest_buy_order_ratio_threshold": 0.75,
+        "min_price": 500,
+        "max_price": 30000
+    },
+    "buff": {
+        "requests_kwargs": {
+            "headers": {
+                "cookie": "session=1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxx"
+            }
+        },
+        "blacklist": {
+            "id": [
+                3986
+            ],
+            "type": [
+                "tool"
+            ]
+        }
+    },
+    "steam": {
+        "request_interval": 20,
+        "requests_kwargs": {
+            "proxies": {
+                "https": "http://127.0.0.1:1080"
+            }
+        }
+    }
+}
