@@ -6,7 +6,9 @@ import requests
 
 from decimal import *
 
-from termcolor import cprint
+from termcolor import cprint, colored
+
+from buff2steam.c5 import C5
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 with open(dir_path + '/config.json') as fp:
@@ -27,6 +29,8 @@ for key, value in config['buff']['requests_kwargs'].items():
 steam_opener = requests.session()
 for key, value in config['steam']['requests_kwargs'].items():
     setattr(steam_opener, key, value)
+
+c5 = C5()
 
 
 def remove_exponent(d):
@@ -132,19 +136,27 @@ try:
 
                 config['buff']['blacklist']['id'].append(item['id'])
 
-                if highest_buy_order_ratio < config['main']['highest_buy_order_ratio_threshold']:
-                    cprint('id: {}; s_cnt: {}; w_cnt: {}; volume: {}; buff_price: {}; '
-                           'b_o_ratio: {:04.2f}; ratio: {:04.2f}'.format(
-                        item['id'], res['total_count'], wanted_cnt, steam_price_overview['volume'], buff_min_price,
-                        highest_buy_order_ratio, current_ratio
-                    ), 'green')
-                    continue
+                # C5 price compare
+                c5_data = c5.query_by_name(item['name'])
 
-                print('id: {}; s_cnt: {}; w_cnt: {}; volume: {}; buff_price: {}; '
-                      'b_o_ratio: {:04.2f}; ratio: {:04.2f}'.format(
-                    item['id'], res['total_count'], wanted_cnt, steam_price_overview['volume'], buff_min_price,
-                    highest_buy_order_ratio, current_ratio
-                ))
+                print(' '.join([
+                    colored('buff_id/price: {buff_id}/{buff_price};'.format(
+                        buff_id=item['id'], buff_price=buff_min_price / 100
+                    ), color='green' if buff_min_price / 100 < c5_data['price'] else None),
+                    colored('c5_id/price: {c5_id}/{c5_price};'.format(
+                        c5_id=c5_data['item_id'] if c5_data else 0, c5_price=c5_data['price'] if c5_data else 0
+                    ), color='green' if c5_data and buff_min_price / 100 > c5_data['price'] else None),
+                    colored('sell/want/sold: {sell}/{want}/{sold};'.format(
+                        sell=res['total_count'], want=wanted_cnt, sold=steam_price_overview['volume']
+                    )),
+                    colored(
+                        'b_o_ratio: {b_o_ratio:04.2f}; ratio: {ratio:04.2f}'.format(
+                            b_o_ratio=highest_buy_order_ratio, ratio=current_ratio
+                        ),
+                        color='green' if highest_buy_order_ratio < config['main'][
+                            'highest_buy_order_ratio_threshold'] else None
+                    )
+                ]))
 except KeyboardInterrupt:
     print('Bye~')
     exit(0)
