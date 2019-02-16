@@ -1,7 +1,8 @@
 import json
 import os
-import time
 import re
+import time
+
 import requests
 
 from decimal import *
@@ -51,7 +52,7 @@ try:
             }).json()
 
             if res['code'] != 'OK':
-                print(res)
+                print(res, flush=True)
                 exit(1)
 
             items = res['data']['items']
@@ -83,7 +84,7 @@ try:
                 })
 
                 if res.status_code == 429:
-                    cprint('steam_api_429', 'magenta')
+                    cprint('steam_api_429', 'magenta', flush=True)
                     continue
 
                 try:
@@ -156,7 +157,7 @@ try:
                         color='green' if highest_buy_order_ratio < config['main'][
                             'highest_buy_order_ratio_threshold'] else None
                     )
-                ]))
+                ]), flush=True)
 except KeyboardInterrupt:
     print('Bye~')
     exit(0)
