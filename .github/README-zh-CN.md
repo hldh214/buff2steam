@@ -49,6 +49,8 @@ pip install -r requirements.txt
 
 ## 配置
 
+### 复制 config.sample.json 为 config.json: `cp config.sample.json config.json`, 以下配置均在 config.json 中进行
+
 ### 获取 buff session
 
 ![session](https://camo.githubusercontent.com/89f04601687e404b342402eb59ac97b148a91bb8/68747470733a2f2f7773332e73696e61696d672e636e2f6c617267652f30303542597170676c793167303036717933356e616a3331367a3070743432742e6a7067)
