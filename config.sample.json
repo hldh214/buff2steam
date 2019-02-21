@@ -20,6 +20,10 @@
             "type": [
                 "tool"
             ]
+        },
+        "auto_buy": {
+            "qty": 1,
+            "pay_method": 3
         }
     },
     "steam": {
