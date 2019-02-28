@@ -2,14 +2,31 @@ import json
 import os
 import re
 import time
+import threading
 
 import requests
 
 from decimal import *
+from http.cookies import SimpleCookie
 
+from requests.cookies import cookiejar_from_dict
 from termcolor import cprint, colored
 
 from buff2steam.c5 import C5
+from buff2steam.buff import Buff
+
+# # debugging start
+# import requests
+# import logging
+# import http.client as http_client
+#
+# http_client.HTTPConnection.debuglevel = 1
+# logging.basicConfig()
+# logging.getLogger().setLevel(logging.DEBUG)
+# requests_log = logging.getLogger("requests.packages.urllib3")
+# requests_log.setLevel(logging.DEBUG)
+# requests_log.propagate = True
+# # debugging end
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 with open(dir_path + '/config.json') as fp:
@@ -32,11 +49,40 @@ for key, value in config['steam']['requests_kwargs'].items():
     setattr(steam_opener, key, value)
 
 c5 = C5()
+s = requests.session()
+
+simple_cookie = SimpleCookie()
+simple_cookie.load(config['buff']['requests_kwargs']['headers']['cookie'])
+
+# Even though SimpleCookie is dictionary-like, it internally uses a Morsel object
+# which is incompatible with requests. Manually construct a dictionary instead.
+buff_cookies = {}
+for key, morsel in simple_cookie.items():
+    buff_cookies[key] = morsel.value
+
+s.cookies = cookiejar_from_dict(buff_cookies)
+buff = Buff(opener=s)
 
 
 def remove_exponent(d):
     return d.quantize(Decimal(1)) if d == d.to_integral() else d.normalize()
 
+
+def while_true_sleep(fun_arg_tuples, seconds=5):
+    while True:
+        for fun, arg in fun_arg_tuples:
+            if arg:
+                fun(**arg)
+            else:
+                fun()
+            time.sleep(seconds)
+
+
+# buff auto withdraw
+if config['buff']['auto_buy']['enable']:
+    threading.Thread(target=while_true_sleep, kwargs={
+        'fun_arg_tuples': [(buff.withdraw, None), (buff.cancel, None)]
+    }).start()
 
 try:
     while True:
@@ -158,6 +204,14 @@ try:
                             'highest_buy_order_ratio_threshold'] else None
                     )
                 ]), flush=True)
+
+                if not config['buff']['auto_buy']['enable']:
+                    continue
+
+                if buff_min_price / 100 < c5_data['price'] \
+                        and highest_buy_order_ratio < config['main']['highest_buy_order_ratio_threshold']:
+                    buff.buy(buff_min_price / 100, item['id'])
+
 except KeyboardInterrupt:
     print('Bye~')
     exit(0)
