@@ -105,6 +105,7 @@ class Buff(BaseProvider):
                 'bill_order_id': each_item['id']
             })
 
+
 if __name__ == '__main__':
     s = requests.session()
     s.cookies = cookiejar_from_dict({
