@@ -142,6 +142,10 @@ try:
                     continue
 
                 listinginfo = res['listinginfo'][next(iter(res['listinginfo']))]
+
+                if 'converted_price' not in listinginfo:
+                    continue
+
                 steam_price = Decimal(listinginfo['converted_price'])
                 steam_tax_ratio = steam_price / (steam_price + Decimal(listinginfo['converted_fee']))
 
