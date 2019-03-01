@@ -6,12 +6,14 @@ from buff2steam import *
 
 
 class Buff(BaseProvider):
-    web_withdraw = 'https://buff.163.com/api/market/backpack/withdraw'
-    web_backpack = 'https://buff.163.com/api/market/backpack'
-    web_sell_order = 'https://buff.163.com/api/market/goods/sell_order'
-    web_buy = 'https://buff.163.com/api/market/goods/buy'
-    web_cancel = 'https://buff.163.com/api/market/bill_order/deliver/cancel'
-    web_history = 'https://buff.163.com/api/market/buy_order/history'
+    base_url = 'https://buff.163.com'
+
+    web_withdraw = base_url + '/api/market/backpack/withdraw'
+    web_backpack = base_url + '/api/market/backpack'
+    web_sell_order = base_url + '/api/market/goods/sell_order'
+    web_buy = base_url + '/api/market/goods/buy'
+    web_cancel = base_url + '/api/market/bill_order/deliver/cancel'
+    web_history = base_url + '/api/market/buy_order/history'
 
     csrf_pattern = re.compile(r'name="csrf_token"\s*content="(.+?)"')
 
@@ -22,14 +24,14 @@ class Buff(BaseProvider):
 
     def post(self, url, **kwargs):
         csrf_token = self.csrf_pattern.findall(
-            self.opener.get('https://buff.163.com').text
+            self.opener.get(self.base_url).text
         )
 
         if not csrf_token:
             raise RuntimeError
 
         self.opener.headers['X-CSRFToken'] = csrf_token[0]
-        self.opener.headers['Referer'] = 'https://buff.163.com'
+        self.opener.headers['Referer'] = self.base_url
 
         return self.opener.post(url, **kwargs)
 
