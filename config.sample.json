@@ -1,7 +1,7 @@
 {
     "main": {
         "game": "dota2",
-        "game_appid": 570,
+        "game_appid": "570",
         "accept_buff_threshold": 0.65,
         "highest_buy_order_ratio_threshold": 0.75,
         "min_price": 500,
@@ -22,8 +22,20 @@
             ]
         },
         "auto_buy": {
+            "enable": false,
             "qty": 1,
             "pay_method": 3
+        }
+    },
+    "c5": {
+        "requests_kwargs": {
+            "headers": {
+                "cookie": ""
+            }
+        },
+        "auto_buy": {
+            "enable": false,
+            "qty": 1
         }
     },
     "steam": {
@@ -31,6 +43,17 @@
         "requests_kwargs": {
             "proxies": {
                 "https": "http://127.0.0.1:1080"
+            }
+        },
+        "auto_sell": {
+            "enable": true,
+            "steam_id": "",
+            "session_id": "",
+            "steam_login_secure": "",
+            "browser_id": "",
+            "asf": {
+                "authentication": "",
+                "2fa_accept_url": ""
             }
         }
     }
