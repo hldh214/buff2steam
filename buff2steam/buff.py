@@ -1,7 +1,3 @@
-import re
-
-from requests.cookies import cookiejar_from_dict
-
 from buff2steam import *
 
 
@@ -111,8 +107,15 @@ class Buff(BaseProvider):
 
 
 if __name__ == '__main__':
+    with open('../config.json') as fp:
+        config = json.load(fp)
+
     s = requests.session()
-    s.cookies = cookiejar_from_dict({
-        'session': ''
-    })
+    simple_cookie = SimpleCookie()
+    simple_cookie.load(config['buff']['requests_kwargs']['headers']['cookie'])
+    buff_cookies = {}
+    for key, morsel in simple_cookie.items():
+        buff_cookies[key] = morsel.value
+    s.cookies = cookiejar_from_dict(buff_cookies)
+
     Buff(opener=s).cancel()

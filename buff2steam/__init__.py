@@ -1,8 +1,14 @@
+import json
+import re
 import typing
 
 import requests
 
-__all__ = ['requests', 'typing', 'BaseProvider']
+from http.cookies import SimpleCookie
+
+from requests.cookies import cookiejar_from_dict
+
+__all__ = ['requests', 'typing', 'BaseProvider', 'json', 're', 'SimpleCookie', 'cookiejar_from_dict']
 
 
 class BaseProvider():
