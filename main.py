@@ -14,7 +14,9 @@ from termcolor import cprint, colored
 
 from buff2steam.c5 import C5
 from buff2steam.buff import Buff
+from buff2steam.steam import Steam
 
+# todo: rework
 # # debugging start
 # import requests
 # import logging
@@ -32,7 +34,7 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 with open(dir_path + '/config.json') as fp:
     config = json.load(fp)
 
-steam_api = 'https://steamcommunity.com/market/listings/' + str(config['main']['game_appid']) + '/{0}/render'
+steam_api = 'https://steamcommunity.com/market/listings/' + config['main']['game_appid'] + '/{0}/render'
 steam_order_api = 'https://steamcommunity.com/market/itemordershistogram?language=schinese&currency=23&item_nameid={0}'
 steam_price_overview_api = 'https://steamcommunity.com/market/priceoverview'
 buff_api = 'https://buff.163.com/api/market/goods'
@@ -49,17 +51,13 @@ for key, value in config['steam']['requests_kwargs'].items():
     setattr(steam_opener, key, value)
 
 c5 = C5()
-s = requests.session()
 
+s = requests.session()
 simple_cookie = SimpleCookie()
 simple_cookie.load(config['buff']['requests_kwargs']['headers']['cookie'])
-
-# Even though SimpleCookie is dictionary-like, it internally uses a Morsel object
-# which is incompatible with requests. Manually construct a dictionary instead.
 buff_cookies = {}
 for key, morsel in simple_cookie.items():
     buff_cookies[key] = morsel.value
-
 s.cookies = cookiejar_from_dict(buff_cookies)
 buff = Buff(opener=s)
 
@@ -80,9 +78,50 @@ def while_true_sleep(fun_arg_tuples, seconds=5):
 
 # buff auto withdraw
 if config['buff']['auto_buy']['enable']:
-    threading.Thread(target=while_true_sleep, kwargs={
+    t = threading.Thread(target=while_true_sleep, kwargs={
         'fun_arg_tuples': [(buff.withdraw, None), (buff.cancel, None)]
-    }).start()
+    })
+    t.setDaemon(True)
+    t.start()
+
+# steam auto sell
+if config['steam']['auto_sell']['enable']:
+    steam_conf = config['steam']
+
+    s = requests.session()
+    for key, value in steam_conf['requests_kwargs'].items():
+        setattr(s, key, value)
+    s.cookies = cookiejar_from_dict({
+        'sessionid': steam_conf['auto_sell']['session_id'],
+        'steamLoginSecure': steam_conf['auto_sell']['steam_login_secure'],
+        'browserid': steam_conf['auto_sell']['browser_id']
+    })
+
+    steam = Steam(
+        s, steam_conf['auto_sell']['asf'],
+        steam_conf['auto_sell']['steam_id'], config['main']['game_appid']
+    )
+
+
+    def steam_auto_sell():
+        while True:
+            inventory = steam.inventory()
+
+            if not inventory:
+                time.sleep(steam_conf['request_interval'])
+
+            for each in inventory:
+                if steam.sell(steam.max_after_tax_price(each['market_hash_name']), each['asset_id']):
+                    print('{} - Sold'.format(each['market_hash_name']), flush=True)
+                else:
+                    cprint('{} - Failed'.format(each['market_hash_name']), 'magenta', flush=True)
+
+            steam.confirm()
+
+
+    t = threading.Thread(target=steam_auto_sell)
+    t.setDaemon(True)
+    t.start()
 
 try:
     while True:
@@ -190,13 +229,19 @@ try:
                 # C5 price compare
                 c5_data = c5.query_by_name(item['name'])
 
+                if not c5_data:
+                    c5_data = {
+                        'item_id': 0,
+                        'price': float('+inf')
+                    }
+
                 print(' '.join([
                     colored('buff_id/price: {buff_id}/{buff_price};'.format(
                         buff_id=item['id'], buff_price=buff_min_price / 100
                     ), color='green' if buff_min_price / 100 < c5_data['price'] else None),
                     colored('c5_id/price: {c5_id}/{c5_price};'.format(
-                        c5_id=c5_data['item_id'] if c5_data else 0, c5_price=c5_data['price'] if c5_data else 0
-                    ), color='green' if c5_data and buff_min_price / 100 > c5_data['price'] else None),
+                        c5_id=c5_data['item_id'], c5_price=c5_data['price']
+                    ), color='green' if buff_min_price / 100 > c5_data['price'] else None),
                     colored('sell/want/sold: {sell}/{want}/{sold};'.format(
                         sell=res['total_count'], want=wanted_cnt, sold=steam_price_overview['volume']
                     )),
