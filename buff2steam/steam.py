@@ -10,8 +10,6 @@ class Steam(BaseProvider):
     web_inventory = base_url + '/inventory/{steam_id}/{game_appid}/{context_id}'
     web_listings = base_url + '/market/listings/{game_appid}/{market_hash_name}/render'
 
-    session_id_pattern = re.compile(r'sessionid=(.{24});')
-
     def __init__(self, opener, asf_config, steam_id, game_appid, context_id=2):
         super().__init__(opener)
         self.asf_config = asf_config
@@ -43,15 +41,10 @@ class Steam(BaseProvider):
         return result
 
     def sell(self, after_tax_price, asset_id) -> bool:
-        session_id = ['0f6ba01078b6a8d35597fbb0']
-
-        if not session_id:
-            return False
-
         self.opener.headers['referer'] = 'https://steamcommunity.com/id/'
 
         res = self.opener.post(self.web_sell, {
-            'sessionid': session_id[0],
+            'sessionid': self.opener.cookies['sessionid'],
             'appid': self.game_appid,
             'contextid': self.context_id,
             'assetid': asset_id,
