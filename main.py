@@ -119,10 +119,11 @@ if config['steam']['auto_sell']['enable']:
                 time.sleep(steam_conf['request_interval'])
 
             for each in inventory:
-                if steam.sell(steam.max_after_tax_price(each['market_hash_name']), each['asset_id']):
-                    print('{} - Sold'.format(each['market_hash_name']), flush=True)
+                after_tax_price = steam.max_after_tax_price(each['market_hash_name'])
+                if steam.sell(after_tax_price, each['asset_id']):
+                    print('{0} - {1} - Sold'.format(each['market_hash_name'], after_tax_price / 100), flush=True)
                 else:
-                    cprint('{} - Failed'.format(each['market_hash_name']), 'magenta', flush=True)
+                    cprint('{0} - Failed'.format(each['market_hash_name']), 'magenta', flush=True)
 
             steam.confirm()
 
