@@ -50,7 +50,7 @@ steam_opener = requests.session()
 for key, value in config['steam']['requests_kwargs'].items():
     setattr(steam_opener, key, value)
 
-c5 = C5(config['c5']['auto_buy']['access_token'])
+c5 = C5(config['c5']['auto_buy']['access_token'], config['main']['game_appid'])
 
 s = requests.session()
 simple_cookie = SimpleCookie()
