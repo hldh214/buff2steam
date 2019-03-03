@@ -2,7 +2,7 @@
 
 > 其實世界上根本就沒有代购, 也可以說人人都是代购, 不管大妹小妹叔叔阿姨, 只要有心, 人人都可以是代购
 
-![head_image](https://user-images.githubusercontent.com/5501843/52898755-b34aaf00-321c-11e9-98f3-8a0ee3e8c302.png)
+![head_image](https://user-images.githubusercontent.com/5501843/53693505-5c2c0900-3ddc-11e9-84c8-67e37e04798d.png)
 
 ## 目录
 
