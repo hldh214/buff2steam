@@ -259,7 +259,10 @@ try:
 
                 if buff_min_price / 100 <= c5_data['price'] \
                         and highest_buy_order_ratio < config['main']['highest_buy_order_ratio_threshold']:
-                    buff.buy(buff_min_price / 100, item['id'])
+                    buff.buy(
+                        float(buff_min_price / 100), item['id'],
+                        config['buff']['auto_buy']['qty'], config['buff']['auto_buy']['pay_method']
+                    )
 
 except KeyboardInterrupt:
     print('Bye~')
