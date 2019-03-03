@@ -53,6 +53,14 @@ class Buff(BaseProvider):
         return True
 
     def buy(self, max_price: float, goods_id: str, auto_buy_qty: int = 1, pay_method: int = 3) -> bool:
+        """
+
+        :param max_price:
+        :param goods_id:
+        :param auto_buy_qty:
+        :param pay_method: 3 -> 支付宝
+        :return:
+        """
         res = self.opener.get(self.web_sell_order, params={
             'game': self.game,
             'goods_id': goods_id,
