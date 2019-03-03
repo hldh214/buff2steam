@@ -11,14 +11,29 @@ class C5:
     api_batch_pre = base_url + '/v4/trade/order/batch-pre'
     api_batch_payment = base_url + '/v4/trade/order/batch-payment'
     api_cancel = base_url + '/v3/user/sell/cancel-self-order'
+    api_login = base_url + '/passport/login'
 
-    status_ok = 200
-
-    def __init__(self, access_token, game_appid='570'):
-        self.common_params = {
-            'access-token': access_token
-        }
+    def __init__(self, username, password, device_id, game_appid='570'):
+        self.username = username
+        self.password = password
+        self.device_id = device_id
         self.game_appid = game_appid
+
+        self.login()
+
+    def login(self):
+        res = requests.post(self.api_login, {
+            'username': self.username,
+            'password': self.password,
+            'device_id': self.device_id,
+        }).json()
+
+        if res['status'] != 200:
+            raise RuntimeError('C5: Login: {0}'.format(res['message']))
+
+        self.common_params = {
+            'access-token': res['data']['access-token']
+        }
 
     def query_by_name(self, name: str) -> typing.Union[dict, bool]:
         res = requests.get(self.api_search, params={
@@ -43,6 +58,14 @@ class C5:
             'num': auto_buy_qty
         }, params=self.common_params).json()
 
+        if res['status'] == 401:
+            self.login()
+            return self.buy(max_price, item_id, auto_buy_qty)
+
+        # may be sold out?
+        if res['status'] == 500:
+            return False
+
         id_list = []
         for item_id in res['data']['list'][0]:
             id_list.append(item_id)
@@ -60,6 +83,10 @@ class C5:
         }
         params.update(self.common_params)
         res = requests.get(self.api_inventory, params=params).json()
+
+        if res['status'] == 401:
+            self.login()
+            return self.withdraw()
 
         id_list = []
         for item in res['data']['list']:
@@ -85,6 +112,10 @@ class C5:
 
         res = requests.get(self.api_history, params=params).json()
 
+        if res['status'] == 401:
+            self.login()
+            return self.cancel()
+
         for order in res['data']['list']:
             requests.post(self.api_cancel, {
                 'order_id': order['order_id']
@@ -97,7 +128,11 @@ if __name__ == '__main__':
     with open('../config.json') as fp:
         config = json.load(fp)
 
-    c5 = C5(config['c5']['auto_buy']['access_token'])
-    # c5.buy(0.01, '18806')
+    c5 = C5(
+        config['c5']['auto_buy']['username'],
+        config['c5']['auto_buy']['password'],
+        config['c5']['auto_buy']['device_id']
+    )
+    c5.buy(0.01, '18806')
     # c5.withdraw()
-    c5.cancel()
+    # c5.cancel()
