@@ -1,12 +1,27 @@
 from buff2steam import *
 
 
-class C5(BaseProvider):
-    # keyword=%E6%9C%88%E7%A5%9E%E9%A3%9E%E9%AA%91
-    api_search = 'https://open.c5game.com/v1/store'
+class C5:
+    base_url = 'https://open.c5game.com'
+
+    api_search = base_url + '/v1/store'
+    api_inventory = base_url + '/v4/user/inventory/index'
+    api_withdraw = base_url + '/v4/user/inventory/withdraw'
+    api_history = base_url + '/v1/user/sell/trade-history'
+    api_batch_pre = base_url + '/v4/trade/order/batch-pre'
+    api_batch_payment = base_url + '/v4/trade/order/batch-payment'
+    api_cancel = base_url + '/v3/user/sell/cancel-self-order'
+
+    status_ok = 200
+
+    def __init__(self, access_token, game_appid='570'):
+        self.common_params = {
+            'access-token': access_token
+        }
+        self.game_appid = game_appid
 
     def query_by_name(self, name: str) -> typing.Union[dict, bool]:
-        res = self.opener.get(self.api_search, params={
+        res = requests.get(self.api_search, params={
             'keyword': name
         }).json()
 
@@ -20,3 +35,69 @@ class C5(BaseProvider):
         for each in data['list']:
             if each['name'] == name:
                 return each
+
+    def buy(self, max_price: float, item_id: str, auto_buy_qty: int = 1):
+        res = requests.post(self.api_batch_pre, {
+            'max_price': max_price,
+            'item_id': item_id,
+            'num': auto_buy_qty
+        }, params=self.common_params).json()
+
+        id_list = []
+        for item_id in res['data']['list'][0]:
+            id_list.append(item_id)
+
+        requests.post(self.api_batch_payment, {
+            'noPwd': 1,
+            'id[]': id_list
+        }, params=self.common_params)
+
+        return True
+
+    def withdraw(self):
+        params = {
+            'appid': self.game_appid,
+        }
+        params.update(self.common_params)
+        res = requests.get(self.api_inventory, params=params).json()
+
+        id_list = []
+        for item in res['data']['list']:
+            id_list.append(item['id'])
+
+        if not id_list:
+            return False
+
+        requests.post(self.api_withdraw, {
+            'appid': self.game_appid,
+            'id[]': id_list,
+        }, params=self.common_params)
+
+        return True
+
+    def cancel(self):
+        params = {
+            'type': 1,
+            'appid': self.game_appid,
+            'status': 1
+        }
+        params.update(self.common_params)
+
+        res = requests.get(self.api_history, params=params).json()
+
+        for order in res['data']['list']:
+            requests.post(self.api_cancel, {
+                'order_id': order['order_id']
+            }, params=params)
+
+        return True
+
+
+if __name__ == '__main__':
+    with open('../config.json') as fp:
+        config = json.load(fp)
+
+    c5 = C5(config['c5']['auto_buy']['access_token'])
+    # c5.buy(0.01, '18806')
+    # c5.withdraw()
+    c5.cancel()
