@@ -238,7 +238,7 @@ try:
                 print(' '.join([
                     colored('buff_id/price: {buff_id}/{buff_price};'.format(
                         buff_id=item['id'], buff_price=buff_min_price / 100
-                    ), color='green' if buff_min_price / 100 < c5_data['price'] else None),
+                    ), color='green' if buff_min_price / 100 <= c5_data['price'] else None),
                     colored('c5_id/price: {c5_id}/{c5_price};'.format(
                         c5_id=c5_data['item_id'], c5_price=c5_data['price']
                     ), color='green' if buff_min_price / 100 > c5_data['price'] else None),
@@ -257,7 +257,7 @@ try:
                 if not config['buff']['auto_buy']['enable']:
                     continue
 
-                if buff_min_price / 100 < c5_data['price'] \
+                if buff_min_price / 100 <= c5_data['price'] \
                         and highest_buy_order_ratio < config['main']['highest_buy_order_ratio_threshold']:
                     buff.buy(buff_min_price / 100, item['id'])
 
