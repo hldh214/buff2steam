@@ -28,13 +28,11 @@
         }
     },
     "c5": {
-        "requests_kwargs": {
-            "headers": {
-                "cookie": ""
-            }
-        },
         "auto_buy": {
             "enable": false,
+            "username": "",
+            "password": "",
+            "device_id": "",
             "qty": 1
         }
     },
