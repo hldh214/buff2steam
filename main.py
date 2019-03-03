@@ -246,39 +246,33 @@ try:
                 buff_min_price_human = float(buff_min_price / 100)
 
                 if buff_min_price_human <= c5_data['price']:
-                    print(' '.join([
-                        colored('buff_id/price: {buff_id}/{buff_price};'.format(
+                    cprint(' '.join([
+                        'buff_id/price: {buff_id}/{buff_price};'.format(
                             buff_id=item['id'], buff_price=buff_min_price_human
-                        )),
-                        colored('sell/want/sold: {sell}/{want}/{sold};'.format(
+                        ),
+                        'sell/want/sold: {sell}/{want}/{sold};'.format(
                             sell=res['total_count'], want=wanted_cnt, sold=steam_price_overview['volume']
-                        )),
-                        colored(
-                            'b_o_ratio: {b_o_ratio:04.2f}; ratio: {ratio:04.2f}'.format(
-                                b_o_ratio=highest_buy_order_ratio, ratio=current_ratio
-                            ),
-                            color='green' if highest_buy_order_ratio < config['main'][
-                                'highest_buy_order_ratio_threshold'] else None
-                        )
-                    ]), flush=True)
+                        ),
+                        'b_o_ratio: {b_o_ratio:04.2f}; ratio: {ratio:04.2f}'.format(
+                            b_o_ratio=highest_buy_order_ratio, ratio=current_ratio
+                        ),
+                    ]), flush=True, color='green' if highest_buy_order_ratio < config['main'][
+                        'highest_buy_order_ratio_threshold'] else None)
                 else:
-                    highest_buy_order_ratio = c5_data['price'] / (highest_buy_order * steam_tax_ratio)
-                    current_ratio = c5_data['price'] / steam_price
-                    print(' '.join([
-                        colored('c5_id/price: {c5_id}/{c5_price};'.format(
+                    highest_buy_order_ratio = Decimal(c5_data['price'] * 100) / (highest_buy_order * steam_tax_ratio)
+                    current_ratio = Decimal(c5_data['price'] * 100) / steam_price
+                    cprint(' '.join([
+                        'c5_id/price: {c5_id}/{c5_price};'.format(
                             c5_id=c5_data['item_id'], c5_price=c5_data['price']
-                        )),
-                        colored('sell/want/sold: {sell}/{want}/{sold};'.format(
+                        ),
+                        'sell/want/sold: {sell}/{want}/{sold};'.format(
                             sell=res['total_count'], want=wanted_cnt, sold=steam_price_overview['volume']
-                        )),
-                        colored(
-                            'b_o_ratio: {b_o_ratio:04.2f}; ratio: {ratio:04.2f}'.format(
-                                b_o_ratio=highest_buy_order_ratio, ratio=current_ratio
-                            ),
-                            color='green' if highest_buy_order_ratio < config['main'][
-                                'highest_buy_order_ratio_threshold'] else None
+                        ),
+                        'b_o_ratio: {b_o_ratio:04.2f}; ratio: {ratio:04.2f}'.format(
+                            b_o_ratio=highest_buy_order_ratio, ratio=current_ratio
                         )
-                    ]), flush=True)
+                    ]), flush=True, color='green' if highest_buy_order_ratio < config['main'][
+                        'highest_buy_order_ratio_threshold'] else None)
 
                 if not config['buff']['auto_buy']['enable']:
                     continue
