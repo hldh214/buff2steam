@@ -10,7 +10,7 @@ from decimal import *
 from http.cookies import SimpleCookie
 
 from requests.cookies import cookiejar_from_dict
-from termcolor import cprint, colored
+from termcolor import cprint
 
 from buff2steam.c5 import C5
 from buff2steam.buff import Buff
@@ -50,7 +50,12 @@ steam_opener = requests.session()
 for key, value in config['steam']['requests_kwargs'].items():
     setattr(steam_opener, key, value)
 
-c5 = C5(config['c5']['auto_buy']['access_token'], config['main']['game_appid'])
+c5 = C5(
+    config['c5']['auto_buy']['username'],
+    config['c5']['auto_buy']['password'],
+    config['c5']['auto_buy']['device_id'],
+    config['main']['game_appid']
+)
 
 s = requests.session()
 simple_cookie = SimpleCookie()
