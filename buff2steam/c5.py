@@ -13,6 +13,8 @@ class C5:
     api_cancel = base_url + '/v3/user/sell/cancel-self-order'
     api_login = base_url + '/passport/login'
 
+    common_params = {}
+
     def __init__(self, username, password, device_id, game_appid='570'):
         self.username = username
         self.password = password
@@ -29,7 +31,8 @@ class C5:
         }).json()
 
         if res['status'] != 200:
-            raise RuntimeError('C5: Login: {0}'.format(res['message']))
+            print('C5: Login:', res, flush=True)
+            exit(1)
 
         self.common_params = {
             'access-token': res['data']['access-token']
