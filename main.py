@@ -233,7 +233,13 @@ try:
                     'appid': config['main']['game_appid'],
                     'currency': 23,
                     'market_hash_name': market_hash_name
-                }).json()
+                })
+
+                if steam_price_overview.status_code == 429:
+                    cprint('steam_price_overview_429', 'magenta', flush=True)
+                    continue
+
+                steam_price_overview = steam_price_overview.json()
 
                 if 'volume' not in steam_price_overview:
                     continue
