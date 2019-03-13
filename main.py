@@ -126,9 +126,9 @@ if config['steam']['auto_sell']['enable']:
             for each in inventory:
                 after_tax_price = steam.max_after_tax_price(each['market_hash_name'])
                 if steam.sell(after_tax_price, each['asset_id']):
-                    print('{0} - {1} - Sold'.format(each['market_hash_name'], after_tax_price / 100), flush=True)
+                    print('{0} - {1} - Sold'.format(each['market_hash_name'], after_tax_price / 100))
                 else:
-                    cprint('{0} - Failed'.format(each['market_hash_name']), 'magenta', flush=True)
+                    cprint('{0} - Failed'.format(each['market_hash_name']), 'magenta')
 
             steam.confirm()
 
@@ -151,7 +151,7 @@ try:
             }).json()
 
             if res['code'] != 'OK':
-                print(res, flush=True)
+                print(res)
                 exit(1)
 
             items = res['data']['items']
@@ -183,7 +183,7 @@ try:
                 })
 
                 if res.status_code == 429:
-                    cprint('steam_api_429', 'magenta', flush=True)
+                    cprint('steam_api_429', 'magenta')
                     continue
 
                 try:
@@ -236,7 +236,7 @@ try:
                 })
 
                 if steam_price_overview.status_code == 429:
-                    cprint('steam_price_overview_429', 'magenta', flush=True)
+                    cprint('steam_price_overview_429', 'magenta')
                     continue
 
                 steam_price_overview = steam_price_overview.json()
@@ -268,7 +268,7 @@ try:
                         'b_o_ratio: {b_o_ratio:04.2f}; ratio: {ratio:04.2f}'.format(
                             b_o_ratio=highest_buy_order_ratio, ratio=current_ratio
                         ),
-                    ]), flush=True, color='green' if highest_buy_order_ratio < config['main'][
+                    ]), color='green' if highest_buy_order_ratio < config['main'][
                         'highest_buy_order_ratio_threshold'] else None)
                 else:
                     highest_buy_order_ratio = Decimal(c5_data['price'] * 100) / (highest_buy_order * steam_tax_ratio)
@@ -283,7 +283,7 @@ try:
                         'b_o_ratio: {b_o_ratio:04.2f}; ratio: {ratio:04.2f}'.format(
                             b_o_ratio=highest_buy_order_ratio, ratio=current_ratio
                         )
-                    ]), flush=True, color='green' if highest_buy_order_ratio < config['main'][
+                    ]), color='green' if highest_buy_order_ratio < config['main'][
                         'highest_buy_order_ratio_threshold'] else None)
 
                 if not config['buff']['auto_buy']['enable']:

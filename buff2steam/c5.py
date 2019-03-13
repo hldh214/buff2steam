@@ -31,7 +31,7 @@ class C5:
         }).json()
 
         if res['status'] != 200:
-            print('C5: Login:', res, flush=True)
+            print('C5: Login:', res)
             exit(1)
 
         self.common_params = {
