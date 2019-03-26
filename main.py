@@ -228,22 +228,6 @@ try:
                 if highest_buy_order_ratio > 1:
                     continue
 
-                # sold in 24h
-                steam_price_overview = steam_opener.get(steam_price_overview_api, params={
-                    'appid': config['main']['game_appid'],
-                    'currency': 23,
-                    'market_hash_name': market_hash_name
-                })
-
-                if steam_price_overview.status_code == 429:
-                    cprint('steam_price_overview_429', 'magenta')
-                    continue
-
-                steam_price_overview = steam_price_overview.json()
-
-                if 'volume' not in steam_price_overview:
-                    continue
-
                 config['buff']['blacklist']['id'].append(item['id'])
 
                 # C5 price compare
@@ -262,8 +246,8 @@ try:
                         'buff_id/price: {buff_id}/{buff_price};'.format(
                             buff_id=item['id'], buff_price=buff_min_price_human
                         ),
-                        'sell/want/sold: {sell}/{want}/{sold};'.format(
-                            sell=res['total_count'], want=wanted_cnt, sold=steam_price_overview['volume']
+                        'sell/want/sold: {sell}/{want};'.format(
+                            sell=res['total_count'], want=wanted_cnt
                         ),
                         'b_o_ratio: {b_o_ratio:04.2f}; ratio: {ratio:04.2f}'.format(
                             b_o_ratio=highest_buy_order_ratio, ratio=current_ratio
@@ -277,8 +261,8 @@ try:
                         'c5_id/price: {c5_id}/{c5_price};'.format(
                             c5_id=c5_data['item_id'], c5_price=c5_data['price']
                         ),
-                        'sell/want/sold: {sell}/{want}/{sold};'.format(
-                            sell=res['total_count'], want=wanted_cnt, sold=steam_price_overview['volume']
+                        'sell/want/sold: {sell}/{want};'.format(
+                            sell=res['total_count'], want=wanted_cnt
                         ),
                         'b_o_ratio: {b_o_ratio:04.2f}; ratio: {ratio:04.2f}'.format(
                             b_o_ratio=highest_buy_order_ratio, ratio=current_ratio
