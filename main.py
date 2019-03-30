@@ -122,6 +122,7 @@ if config['steam']['auto_sell']['enable']:
 
             if not inventory:
                 time.sleep(steam_conf['request_interval'])
+                continue
 
             for each in inventory:
                 after_tax_price = steam.max_after_tax_price(each['market_hash_name'])
