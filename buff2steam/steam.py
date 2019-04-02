@@ -76,9 +76,10 @@ class Steam(BaseProvider):
         pass  # todo
 
     def confirm(self) -> bool:
-        return requests.post(self.asf_config['2fa_accept_url'], headers={
-            'authentication': self.asf_config['authentication']
-        }).json()['Success']
+        return requests.post(
+            self.asf_config['2fa_accept_url'],
+            **self.asf_config['requests_kwargs']
+        ).json()['Success']
 
 
 if __name__ == '__main__':

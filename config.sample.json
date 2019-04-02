@@ -50,7 +50,11 @@
             "steam_login_secure": "",
             "browser_id": "",
             "asf": {
-                "authentication": "",
+                "requests_kwargs": {
+                    "headers": {
+                        "authentication": ""
+                    }
+                },
                 "2fa_accept_url": ""
             }
         }
