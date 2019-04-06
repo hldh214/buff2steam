@@ -15,11 +15,12 @@ class C5:
 
     common_params = {}
 
-    def __init__(self, username, password, device_id, game_appid='570'):
+    def __init__(self, username, password, device_id, pay_pwd, game_appid='570'):
         self.username = username
         self.password = password
         self.device_id = device_id
         self.game_appid = game_appid
+        self.pay_pwd = pay_pwd
 
         self.login()
 
@@ -74,7 +75,8 @@ class C5:
             id_list.append(item_id)
 
         requests.post(self.api_batch_payment, {
-            'noPwd': 1,
+            'noPwd': 0,
+            'paypwd': self.pay_pwd,
             'id[]': id_list
         }, params=self.common_params)
 
@@ -136,6 +138,6 @@ if __name__ == '__main__':
         config['c5']['auto_buy']['password'],
         config['c5']['auto_buy']['device_id']
     )
-    c5.buy(0.01, '18806')
+    c5.buy(9.99, '553462370')
     # c5.withdraw()
     # c5.cancel()

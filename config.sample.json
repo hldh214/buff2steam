@@ -33,6 +33,7 @@
             "username": "",
             "password": "",
             "device_id": "",
+            "pay_pwd": "",
             "qty": 1
         }
     },

@@ -54,6 +54,7 @@ c5 = C5(
     config['c5']['auto_buy']['username'],
     config['c5']['auto_buy']['password'],
     config['c5']['auto_buy']['device_id'],
+    config['c5']['auto_buy']['pay_pwd'],
     config['main']['game_appid']
 )
 
