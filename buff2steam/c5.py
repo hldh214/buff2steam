@@ -136,7 +136,8 @@ if __name__ == '__main__':
     c5 = C5(
         config['c5']['auto_buy']['username'],
         config['c5']['auto_buy']['password'],
-        config['c5']['auto_buy']['device_id']
+        config['c5']['auto_buy']['device_id'],
+        config['c5']['auto_buy']['pay_pwd']
     )
     c5.buy(9.99, '553462370')
     # c5.withdraw()
