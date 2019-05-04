@@ -22,7 +22,6 @@ class C5:
             }
             return
 
-        print(1)
         self.username = username
         self.password = password
         self.device_id = device_id
