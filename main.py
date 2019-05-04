@@ -248,7 +248,7 @@ try:
                         'buff_id/price: {buff_id}/{buff_price};'.format(
                             buff_id=item['id'], buff_price=buff_min_price_human
                         ),
-                        'sell/want/sold: {sell}/{want};'.format(
+                        'sell/want: {sell}/{want};'.format(
                             sell=res['total_count'], want=wanted_cnt
                         ),
                         'b_o_ratio: {b_o_ratio:04.2f}; ratio: {ratio:04.2f}'.format(
@@ -263,7 +263,7 @@ try:
                         'c5_id/price: {c5_id}/{c5_price};'.format(
                             c5_id=c5_data['item_id'], c5_price=c5_data['price']
                         ),
-                        'sell/want/sold: {sell}/{want};'.format(
+                        'sell/want: {sell}/{want};'.format(
                             sell=res['total_count'], want=wanted_cnt
                         ),
                         'b_o_ratio: {b_o_ratio:04.2f}; ratio: {ratio:04.2f}'.format(
