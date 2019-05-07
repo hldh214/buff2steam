@@ -45,7 +45,7 @@
             }
         },
         "auto_sell": {
-            "enable": true,
+            "enable": false,
             "steam_id": "",
             "session_id": "",
             "steam_login_secure": "",

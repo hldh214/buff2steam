@@ -16,6 +16,10 @@ class C5:
     common_params = {}
 
     def __init__(self, username, password, device_id, pay_pwd, game_appid='570', access_token=None):
+        # we dont need login
+        if not username:
+            return
+
         if access_token is not None:
             self.common_params = {
                 'access-token': access_token
