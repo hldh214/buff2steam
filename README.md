@@ -1,3 +1,6 @@
+ ***deprecated cuz paxful***
+![image](https://user-images.githubusercontent.com/5501843/62419802-84859f80-b6bb-11e9-9351-c1c39b8f6c3d.png)
+
 # buff2steam
 
 > make money from buff.163.com
