@@ -1,5 +1,11 @@
- ***deprecated cuz paxful***
-![image](https://user-images.githubusercontent.com/5501843/62419802-84859f80-b6bb-11e9-9351-c1c39b8f6c3d.png)
+<p align="center">
+  <b>Special thanks to the generous sponsorship by:</b>
+  <br><br>
+  <a target="_blank" href="https://www.jetbrains.com/?from=buff2steam">
+    <img src="https://i.loli.net/2018/03/21/5ab223b75cdfa.png" width=250>
+  </a>
+  <br><br>
+</p>
 
 # buff2steam
 
