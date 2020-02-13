@@ -23,5 +23,6 @@ class Producer:
 
     async def query_price(self, item_id):
         # query price and calculate
-        response = await httpx.get('https://httpbin.org/delay/4')
+        async with httpx.AsyncClient() as client:
+            response = await client.get('https://httpbin.org/delay/4')
         return response.text
