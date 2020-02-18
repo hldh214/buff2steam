@@ -1,20 +1,28 @@
-from buff2steam import *
+import json
+import re
+import typing
+
+import httpx
 
 
-class Buff(BaseProvider):
+class Buff():
     base_url = 'https://buff.163.com'
 
-    web_withdraw = base_url + '/api/market/backpack/withdraw'
-    web_backpack = base_url + '/api/market/backpack'
-    web_sell_order = base_url + '/api/market/goods/sell_order'
-    web_buy = base_url + '/api/market/goods/buy'
-    web_cancel = base_url + '/api/market/bill_order/deliver/cancel'
-    web_history = base_url + '/api/market/buy_order/history'
+    web_goods = '/api/market/goods'
+    web_withdraw = '/api/market/backpack/withdraw'
+    web_backpack = '/api/market/backpack'
+    web_sell_order = '/api/market/goods/sell_order'
+    web_buy = '/api/market/goods/buy'
+    web_cancel = '/api/market/bill_order/deliver/cancel'
+    web_history = '/api/market/buy_order/history'
 
     csrf_pattern = re.compile(r'name="csrf_token"\s*content="(.+?)"')
 
-    def __init__(self, game='dota2', game_appid=570, opener=None):
-        super().__init__(opener)
+    def __init__(self, game='dota2', game_appid=570, request_kwargs=None):
+        if request_kwargs is None:
+            request_kwargs = {}
+
+        self.opener = httpx.AsyncClient(base_url=self.base_url, **request_kwargs)
         self.game = game
         self.game_appid = game_appid
 
@@ -30,6 +38,30 @@ class Buff(BaseProvider):
         self.opener.headers['Referer'] = self.base_url
 
         return self.opener.post(url, **kwargs)
+
+    async def request(self, *args, **kwargs) -> dict:
+        response = await self.opener.request(*args, **kwargs)
+
+        if response.json()['code'] != 'OK':
+            raise Exception(response.json())
+
+        return response.json()['data']
+
+    async def get_total_page(self):
+        response = await self.request('get', self.web_goods, params={
+            'page_num': 1,
+            'game': self.game
+        })
+
+        return response.get('total_page')
+
+    async def get_items(self, page):
+        response = await self.request('get', self.web_goods, params={
+            'page_num': page,
+            'game': self.game
+        })
+
+        return response.get('items')
 
     def withdraw(self, backpack_ids: typing.List[str] = None) -> bool:
         if not backpack_ids:
@@ -110,18 +142,3 @@ class Buff(BaseProvider):
                 'game': self.game,
                 'bill_order_id': each_item['id']
             })
-
-
-if __name__ == '__main__':
-    with open('../config.json') as fp:
-        config = json.load(fp)
-
-    s = requests.session()
-    simple_cookie = SimpleCookie()
-    simple_cookie.load(config['buff']['requests_kwargs']['headers']['cookie'])
-    buff_cookies = {}
-    for key, morsel in simple_cookie.items():
-        buff_cookies[key] = morsel.value
-    s.cookies = cookiejar_from_dict(buff_cookies)
-
-    Buff(opener=s).cancel()

@@ -1,2 +1,1 @@
-httpx==0.11.1
-tornado==6.0.3
+httpx==0.11.*

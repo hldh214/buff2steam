@@ -2,7 +2,7 @@
   <b>Special thanks to the generous sponsorship by:</b>
   <br><br>
   <a target="_blank" href="https://www.jetbrains.com/?from=buff2steam">
-    <img src="https://i.loli.net/2018/03/21/5ab223b75cdfa.png" width=250>
+    <img src="https://camo.githubusercontent.com/bf70170ad535c1272fa96b10a21325bb42d46a88/68747470733a2f2f692e6c6f6c692e6e65742f323031382f30332f32312f356162323233623735636466612e706e67" width=250 alt="logo">
   </a>
   <br><br>
 </p>
