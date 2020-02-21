@@ -24,12 +24,6 @@ async def main():
     for each_page in range(1, total_page + 1):
         items = await buff.get_items(each_page)
         for item in items:
-            if item['id'] in config['buff']['blacklist']['id']:
-                continue
-
-            if item['goods_info']['info']['tags']['type']['internal_name'] in config['buff']['blacklist']['type']:
-                continue
-
             market_hash_name = item['market_hash_name']
             buff_min_price = remove_exponent(decimal.Decimal(item['sell_min_price']) * 100)
             buff_says_steam_price = remove_exponent(decimal.Decimal(item['goods_info']['steam_price_cny']) * 100)

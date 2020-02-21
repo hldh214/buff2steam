@@ -13,14 +13,6 @@
                 "cookie": "session=1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxx"
             }
         },
-        "blacklist": {
-            "id": [
-                3986
-            ],
-            "type": [
-                "tool"
-            ]
-        },
         "auto_buy": {
             "enable": false,
             "qty": 1,
