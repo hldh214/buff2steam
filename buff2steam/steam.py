@@ -1,17 +1,15 @@
-# WARNING: may cause VAC ban
-# BE CAUTION
-from buff2steam import *
+import httpx
 
 
-class Steam(BaseProvider):
+class Steam:
     base_url = 'https://steamcommunity.com'
 
-    web_sell = base_url + '/market/sellitem'
-    web_inventory = base_url + '/inventory/{steam_id}/{game_appid}/{context_id}'
-    web_listings = base_url + '/market/listings/{game_appid}/{market_hash_name}/render'
+    web_sell = '/market/sellitem'
+    web_inventory = '/inventory/{steam_id}/{game_appid}/{context_id}'
+    web_listings = '/market/listings/{game_appid}/{market_hash_name}/render'
 
-    def __init__(self, opener, asf_config, steam_id, game_appid, context_id=2):
-        super().__init__(opener)
+    def __init__(self, asf_config, steam_id, game_appid, context_id=2):
+        self.opener = httpx.AsyncClient(base_url=self.base_url)
         self.asf_config = asf_config
         self.game_appid = game_appid
         self.context_id = context_id
@@ -43,7 +41,7 @@ class Steam(BaseProvider):
     def sell(self, after_tax_price, asset_id) -> bool:
         self.opener.headers['referer'] = 'https://steamcommunity.com/id/'
 
-        res = self.opener.post(self.web_sell, {
+        res = self.opener.post(self.web_sell, data={
             'sessionid': self.opener.cookies['sessionid'],
             'appid': self.game_appid,
             'contextid': self.context_id,

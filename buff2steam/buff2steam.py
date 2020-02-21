@@ -31,10 +31,7 @@ async def main():
             if not config['main']['max_price'] > buff_min_price > config['main']['min_price']:
                 continue
 
-            if not buff_says_steam_price:
-                continue
-
-            buff_says_ratio = buff_min_price / buff_says_steam_price
+            buff_says_ratio = buff_min_price / buff_says_steam_price if buff_says_steam_price else 1
             if buff_says_ratio > decimal.Decimal(config['main']['accept_buff_threshold']):
                 continue
 
