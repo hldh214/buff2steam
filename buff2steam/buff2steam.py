@@ -42,15 +42,32 @@ async def main():
                 continue
 
             try:
-                steam_max_after_tax_price = await steam.max_after_tax_price(market_hash_name)
+                listings_data = await steam.listings_data(market_hash_name)
             except Exception as exception:
                 print(exception)
                 await asyncio.sleep(config['steam']['request_interval'])
                 continue
 
-            current_ratio = buff_min_price / steam_max_after_tax_price
+            current_ratio = buff_min_price / listings_data['converted_price']
 
-            print(market_hash_name, '{:.2f}'.format(buff_says_ratio), '{:.2f}'.format(current_ratio))
+            orders_data = await steam.orders_data(market_hash_name)
+            highest_buy_order = decimal.Decimal(orders_data['highest_buy_order'])
+            wanted_cnt = orders_data['wanted_cnt']
+            steam_tax_ratio = decimal.Decimal(listings_data['steam_tax_ratio'])
+            highest_buy_order_ratio = buff_min_price / (highest_buy_order * steam_tax_ratio)
+            buff_min_price_human = float(buff_min_price / 100)
+
+            print(' '.join([
+                'buff_id/price: {buff_id}/{buff_price};'.format(
+                    buff_id=item['id'], buff_price=buff_min_price_human
+                ),
+                'sell/want: {sell}/{want};'.format(
+                    sell=listings_data['total_count'], want=wanted_cnt
+                ),
+                'b_o_ratio: {b_o_ratio:04.2f}; ratio: {ratio:04.2f}'.format(
+                    b_o_ratio=highest_buy_order_ratio, ratio=current_ratio
+                )
+            ]))
 
             await asyncio.sleep(config['steam']['request_interval'])
 
