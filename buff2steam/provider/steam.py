@@ -8,8 +8,8 @@ class Steam:
     web_inventory = '/inventory/{steam_id}/{game_appid}/{context_id}'
     web_listings = '/market/listings/{game_appid}/{market_hash_name}/render'
 
-    def __init__(self, asf_config, steam_id, game_appid, context_id=2):
-        self.opener = httpx.AsyncClient(base_url=self.base_url)
+    def __init__(self, asf_config=None, steam_id=None, game_appid='', context_id=2, request_kwargs=None):
+        self.opener = httpx.AsyncClient(base_url=self.base_url, **request_kwargs)
         self.asf_config = asf_config
         self.game_appid = game_appid
         self.context_id = context_id
@@ -57,13 +57,16 @@ class Steam:
 
         return res['success']
 
-    def max_after_tax_price(self, market_hash_name):
-        res = self.opener.get(self.web_listings.format(market_hash_name=market_hash_name), params={
+    async def max_after_tax_price(self, market_hash_name):
+        res = await self.opener.get(self.web_listings.format(market_hash_name=market_hash_name), params={
             'count': 1,
             'currency': 23
-        }).json()
+        })
 
-        listinginfo = res['listinginfo'][next(iter(res['listinginfo']))]
+        if res.status_code == 429:
+            raise Exception('steam_api_429')
+
+        listinginfo = res.json()['listinginfo'][next(iter(res.json()['listinginfo']))]
 
         return listinginfo['converted_price']
 

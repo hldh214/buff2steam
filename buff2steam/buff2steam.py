@@ -3,6 +3,7 @@ import decimal
 import json
 
 import provider.buff
+import provider.steam
 
 with open('../config.json') as fp:
     config = json.load(fp)
@@ -17,6 +18,11 @@ async def main():
         config['main']['game'],
         config['main']['game_appid'],
         config['buff']['requests_kwargs']
+    )
+
+    steam = provider.steam.Steam(
+        game_appid=config['main']['game_appid'],
+        request_kwargs=config['steam']['requests_kwargs']
     )
 
     total_page = await buff.get_total_page()
@@ -35,8 +41,18 @@ async def main():
             if buff_says_ratio > decimal.Decimal(config['main']['accept_buff_threshold']):
                 continue
 
-            print(market_hash_name, buff_says_ratio)
-            # todo: steam integration
+            try:
+                steam_max_after_tax_price = await steam.max_after_tax_price(market_hash_name)
+            except Exception as exception:
+                print(exception)
+                await asyncio.sleep(config['steam']['request_interval'])
+                continue
+
+            current_ratio = buff_min_price / steam_max_after_tax_price
+
+            print(market_hash_name, '{:.2f}'.format(buff_says_ratio), '{:.2f}'.format(current_ratio))
+
+            await asyncio.sleep(config['steam']['request_interval'])
 
 
 if __name__ == '__main__':
