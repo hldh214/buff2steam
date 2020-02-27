@@ -10,6 +10,7 @@
 - [先决条件](#先决条件)
 - [依赖](#依赖)
 - [配置](#配置)
+  * [config.json](#config.json)
   * [获取 buff session](#获取-buff-session)
 - [使用方法](#使用方法)
 - [License](#license)
@@ -44,16 +45,24 @@ buff2steam 是一个爬虫脚本, 用于爬取 [网易buff](https://buff.163.com
 ## 依赖
 
 ```
+# python 版本需要 >= 3.7
 pip install -r requirements.txt
 ```
 
 ## 配置
 
-### 复制 config.sample.json 为 config.json: `cp config.sample.json config.json`, 以下配置均在 config.json 中进行
+### config.json
+
+复制 config.sample.json 为 config.json: 
+
+`cp config.sample.json config.json`
+
+以下配置均在 config.json 中进行
 
 ### 获取 buff session
 
-![session](https://camo.githubusercontent.com/89f04601687e404b342402eb59ac97b148a91bb8/68747470733a2f2f7773332e73696e61696d672e636e2f6c617267652f30303542597170676c793167303036717933356e616a3331367a3070743432742e6a7067)
+![session](https://user-images.githubusercontent.com/5501843/75434392-6ac7e480-598c-11ea-85d4-108ac2972cc1.png)
+
 如图: Chrome 浏览器 -> F12 -> Network选项卡 -> 刷新网页 -> Doc筛选 -> Response Headers 部分
 蓝色框框里面就是我们需要的session
 
@@ -66,26 +75,20 @@ proxies = {
     'https': 'http://127.0.0.1:1080'
 }
 
-# [可保持默认]buff id 黑名单
-buff_id_blacklist = (3986,)
-
-# [可保持默认]buff type 黑名单
-buff_type_blacklist = ('tool',)
-
-# [可保持默认]游戏名, 目前仅支持 DotA2
+# [可保持默认]游戏名, 目前仅测试了 DotA2, CSGO
 game = 'dota2'
 
-# [可保持默认]游戏 appid, 目前仅支持 DotA2
+# [可保持默认]游戏 appid, 目前仅测试了 DotA2(570), CSGO(730)
 game_appid = '570'
 
 # [可保持默认]货币 id(23 => CNY)
 currency = 23  # CNY
 
 # [可保持默认]buff 上显示的 steam 价格(可能不准确, 设置较低的值比较好)阈值
-accept_buff_threshold = Decimal(0.6)
+accept_buff_threshold = 0.65
 
 # [可保持默认]立即出售阈值
-highest_buy_order_ratio_threshold = Decimal(0.75)
+highest_buy_order_ratio_threshold = 0.75
 
 # [可保持默认]buff饰品价格最小与最大值区间(CNY * 100)
 min_price = 1000
@@ -98,7 +101,7 @@ steam_api_sleep = 30
 ## 使用方法
 
 ```
-python3 main.py
+python -m buff2steam
 ```
 
 ## License

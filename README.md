@@ -26,48 +26,13 @@
 
 ## requirements
 
+`python >= 3.7`
+
 `pip install -r requirements.txt`
 
 ## usage
 
-`python3 main.py`
-
-----------------
-
-## buff_session && more config
-
-``` python
-# enter your session
-buff_session = 'session=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-
-# buff id blacklist
-buff_id_blacklist = (3986,)
-
-# buff type blacklist
-buff_type_blacklist = ('tool',)
-
-# game name in alphabet
-game = 'dota2'
-
-# game appid in number
-game_appid = '570'
-
-# currency id(23 => CNY)
-currency = 23  # CNY
-
-# buff says price ratio
-accept_buff_threshold = Decimal(0.6)
-
-# sell now ratio
-highest_buy_order_ratio_threshold = Decimal(0.75)
-
-# CNY * 100
-min_price = 1000
-max_price = 30000
-
-# steam api request interval
-steam_api_sleep = 30
-```
+`python -m buff2steam`
 
 ## License
 

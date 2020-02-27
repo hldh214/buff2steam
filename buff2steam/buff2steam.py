@@ -1,26 +1,24 @@
+import argparse
 import asyncio
 import decimal
 import json
 
-import provider.buff
-import provider.steam
-
-with open('../config.json') as fp:
-    config = json.load(fp)
+from .provider.buff import Buff
+from .provider.steam import Steam
 
 
 def remove_exponent(d):
     return d.quantize(decimal.Decimal(1)) if d == d.to_integral() else d.normalize()
 
 
-async def main():
-    buff = provider.buff.Buff(
+async def _main(config):
+    buff = Buff(
         config['main']['game'],
         config['main']['game_appid'],
         config['buff']['requests_kwargs']
     )
 
-    steam = provider.steam.Steam(
+    steam = Steam(
         game_appid=config['main']['game_appid'],
         request_kwargs=config['steam']['requests_kwargs']
     )
@@ -72,6 +70,12 @@ async def main():
             await asyncio.sleep(config['steam']['request_interval'])
 
 
-if __name__ == '__main__':
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-c', '--config', help='config path', default='./config.json')
+    args = parser.parse_args()
+    with open(args.config) as fp:
+        config = json.load(fp)
+
     while True:
-        asyncio.run(main())
+        asyncio.run(_main(config))
