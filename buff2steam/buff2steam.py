@@ -1,7 +1,8 @@
 import argparse
-import asyncio
 import decimal
 import json
+
+import trio
 
 from .provider.buff import Buff
 from .provider.steam import Steam
@@ -24,7 +25,6 @@ async def _main(config):
     )
 
     total_page = await buff.get_total_page()
-    # print(await asyncio.gather(buff.get_total_page(), buff.get_total_page(), buff.get_total_page()))
     for each_page in range(1, total_page + 1):
         items = await buff.get_items(each_page)
         for item in items:
@@ -40,10 +40,11 @@ async def _main(config):
                 continue
 
             try:
+                # todo: gather
                 listings_data = await steam.listings_data(market_hash_name)
             except Exception as exception:
                 print(exception)
-                await asyncio.sleep(config['steam']['request_interval'])
+                await trio.sleep(config['steam']['request_interval'])
                 continue
 
             current_ratio = buff_min_price / listings_data['converted_price']
@@ -67,15 +68,22 @@ async def _main(config):
                 )
             ]))
 
-            await asyncio.sleep(config['steam']['request_interval'])
+            await trio.sleep(config['steam']['request_interval'])
 
 
-def main():
+async def trio_wrapper():
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--config', help='config path', default='./config.json')
     args = parser.parse_args()
     with open(args.config) as fp:
         config = json.load(fp)
 
-    while True:
-        asyncio.run(_main(config))
+    try:
+        while True:
+            await _main(config)
+    except KeyboardInterrupt:
+        exit('Bye~')
+
+
+def main():
+    trio.run(trio_wrapper)
