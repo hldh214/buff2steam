@@ -19,7 +19,6 @@
 
 - [requirements](#requirements)
 - [usage](#usage)
-- [buff_session && more config](#buff-session----more-config)
 - [License](#license)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
