@@ -25,9 +25,13 @@ async def _main(config):
     )
 
     total_page = await buff.get_total_page()
+    visited = set()
     for each_page in range(1, total_page + 1):
         items = await buff.get_items(each_page)
         for item in items:
+            if item['id'] in visited:
+                continue
+
             market_hash_name = item['market_hash_name']
             buff_min_price = remove_exponent(decimal.Decimal(item['sell_min_price']) * 100)
             buff_says_steam_price = remove_exponent(decimal.Decimal(item['goods_info']['steam_price_cny']) * 100)
@@ -55,6 +59,8 @@ async def _main(config):
             steam_tax_ratio = decimal.Decimal(listings_data['steam_tax_ratio'])
             highest_buy_order_ratio = buff_min_price / (highest_buy_order * steam_tax_ratio)
             buff_min_price_human = float(buff_min_price / 100)
+
+            visited.add(item['id'])
 
             print(' '.join([
                 'buff_id/price: {buff_id}/{buff_price};'.format(
