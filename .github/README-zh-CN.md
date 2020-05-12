@@ -1,19 +1,15 @@
 # buff2steam
 
-> 其實世界上根本就沒有代购, 也可以說人人都是代购, 不管大妹小妹叔叔阿姨, 只要有心, 人人都可以是代购
-
-![head_image](https://user-images.githubusercontent.com/5501843/53693505-5c2c0900-3ddc-11e9-84c8-67e37e04798d.png)
-
 ## 目录
 
 - [简介](#简介)
 - [先决条件](#先决条件)
 - [依赖](#依赖)
 - [配置](#配置)
-  * [config.json](#config.json)
+  * [config](#config)
   * [获取 buff session](#获取-buff-session)
 - [使用方法](#使用方法)
-- [License](#license)
+- [license](#license)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
@@ -51,13 +47,41 @@ pip install -r requirements.txt
 
 ## 配置
 
-### config.json
+### config
 
 复制 config.sample.json 为 config.json: 
 
 `cp config.sample.json config.json`
 
 以下配置均在 config.json 中进行
+
+```json5
+{
+    "main": {
+        "game": "csgo",  // dota2
+        "game_appid": "730",  // 570
+        "accept_buff_threshold": 0.65,  // buff 上面展示的`参考价格`和其实际在售最低价所计算出来的比例
+        "min_price": 500,  // 单位为分, 500 == 5 元
+        "max_price": 30000  // 单位为分, 30000 == 300 元
+    },
+    "buff": {
+        "requests_kwargs": {
+            "headers": {
+                "cookie": "session=1-GyCKVt_sSLoNtu2yeM9hY8FPeWTr8Q6ayOYIifqxKLM82044786689"
+            }
+        }
+    },
+    "steam": {
+        "request_interval": 20,  // steam api 请求间隔, 单位为秒
+        "requests_kwargs": {
+            // 代理设置, 若不需要则可去除
+            "proxies": {
+                "https": "http://127.0.0.1:7890"
+            }
+        }
+    }
+}
+```
 
 ### 获取 buff session
 
@@ -66,44 +90,12 @@ pip install -r requirements.txt
 如图: Chrome 浏览器 -> F12 -> Network选项卡 -> 刷新网页 -> Doc筛选 -> Response Headers 部分
 蓝色框框里面就是我们需要的session
 
-```python
-# [必填]填你的 buff 网页 session
-buff_session = 'session=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-
-# [必填]代理 ip, 如果使用 SS Windows 客户端并且是默认配置, 则此项可保持默认, 若不需要代理则可去掉
-proxies = {
-    'https': 'http://127.0.0.1:1080'
-}
-
-# [可保持默认]游戏名, 目前仅测试了 DotA2, CSGO
-game = 'dota2'
-
-# [可保持默认]游戏 appid, 目前仅测试了 DotA2(570), CSGO(730)
-game_appid = '570'
-
-# [可保持默认]货币 id(23 => CNY)
-currency = 23  # CNY
-
-# [可保持默认]buff 上显示的 steam 价格(可能不准确, 设置较低的值比较好)阈值
-accept_buff_threshold = 0.65
-
-# [可保持默认]立即出售阈值
-highest_buy_order_ratio_threshold = 0.75
-
-# [可保持默认]buff饰品价格最小与最大值区间(CNY * 100)
-min_price = 1000
-max_price = 30000
-
-# [可保持默认]steam api 请求间隔, ,秒为单位, 太长降低脚本效率, 太短会被 steam 封 ip
-steam_api_sleep = 30
-```
-
 ## 使用方法
 
 ```
 python -m buff2steam
 ```
 
-## License
+## license
 
 buff2steam is open-source software licensed under the Unlicense License. See the LICENSE file for more information.
