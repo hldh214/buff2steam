@@ -64,6 +64,10 @@
 }
 ```
 
+## StarChart
+
+![starchart](https://starchart.cc/hldh214/buff2steam.svg)
+
 ## license
 
 buff2steam is open-source software licensed under the Unlicense License. See the LICENSE file for more information.
