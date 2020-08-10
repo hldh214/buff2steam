@@ -36,6 +36,8 @@
 
 ## config
 
+### config.json
+
 ```json5
 {
     "main": {
@@ -63,6 +65,13 @@
     }
 }
 ```
+
+### buff_session
+
+![session](https://user-images.githubusercontent.com/5501843/75434392-6ac7e480-598c-11ea-85d4-108ac2972cc1.png)
+
+Chrome -> F12 -> Network Tab -> Refresh webpage -> Doc filter -> Response Headers
+find `session` in `Set-Cookie` and paste it into `config.json -> buff.requests_kwargs.headers.cookie`
 
 ## StarChart
 
