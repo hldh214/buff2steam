@@ -20,12 +20,13 @@ class Buff:
         if request_kwargs is None:
             request_kwargs = {}
 
-        self.opener = httpx.AsyncClient(base_url=self.base_url, **request_kwargs)
+        self.request_kwargs = request_kwargs
         self.game = game
         self.game_appid = game_appid
 
     async def request(self, *args, **kwargs) -> dict:
-        response = await self.opener.request(*args, **kwargs)
+        async with httpx.AsyncClient(base_url=self.base_url, **self.request_kwargs) as client:
+            response = await client.request(*args, **kwargs)
 
         if response.json()['code'] != 'OK':
             raise Exception(response.json())
