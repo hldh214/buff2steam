@@ -18,6 +18,8 @@
 
 buff2steam 是一个爬虫脚本, 用于爬取 [网易buff](https://buff.163.com/) 上售价低于 [steam 社区市场](https://steamcommunity.com/market/) 上的饰品
 
+![demo](https://user-images.githubusercontent.com/5501843/111403234-9ccaf680-8707-11eb-8f92-6d942e38acf4.png)
+
 设置差价阈值后, 脚本会自动计算差价并筛选出符合的饰品, 如上图
 
  - `buff_id` 表示此物品 https://buff.163.com/market/goods?goods_id=2334 里面的 goods_id
