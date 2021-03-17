@@ -9,18 +9,40 @@
 
 # buff2steam
 
-> make money from buff.163.com
+> Find item which cheaper than steamcommunity from buff
 
 [简体中文](.github/README-zh-CN.md)
 
 ## Table of Contents
 
+- [Introduction](#introduction)
 - [requirements](#requirements)
 - [usage](#usage)
 - [config](#config)
+  * [config.json](#configjson)
+  * [buff_session](#buff_session)
+- [StarChart](#starchart)
 - [license](#license)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
+## Introduction
+
+buff2steam is a script, for crawling items from [buff](https://buff.163.com/) which cheaper than [steamcommunity](https://steamcommunity.com/market/).
+
+![demo](https://user-images.githubusercontent.com/5501843/111403234-9ccaf680-8707-11eb-8f92-6d942e38acf4.png)
+
+After set `threshold` in the `config.json` file, the script will automatically calculate the price difference and filter out matching items, as shown above.
+
+ - `buff_id` means `goods_id` in url: https://buff.163.com/market/goods?goods_id=2334
+ - `price` means this item's price on buff
+ - `sell/want` means this item's sell/buy order count on steamcommunity market
+ - `b_o_ratio` means the ratio obtained by selling this item to the highest buy order in the steamcommunity market **immediately** (after deducting the handling fee)
+ - `ratio` means the  **possible** ratio obtained by selling this item with the lowest sell order price in the steamcommunity market (after deducting the handling fee)
+
+The last two ratios are the ratio of the price difference. The lower the value, the better, and it means that you have obtained the discounted steam wallet balance through this transaction. 
+
+Then you can buy items from buff manually and sell them to the steamcommunity.
 
 ## requirements
 

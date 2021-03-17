@@ -20,13 +20,11 @@ buff2steam 是一个爬虫脚本, 用于爬取 [网易buff](https://buff.163.com
 
 设置差价阈值后, 脚本会自动计算差价并筛选出符合的饰品, 如上图
 
- - id 表示此物品 https://buff.163.com/market/goods?goods_id=2334 里面的 goods_id
- - s_cnt 表示此物品在 steam 社区市场上的出售单数量
- - w_cnt 表示此物品在 steam 社区市场上的订购单数量
- - volume 表示此物品在 steam 社区市场上 24h 内的销量
- - buff_price 表示此物品在 buff 上的最低售价
- - b_o_ratio 表示此物品在 steam 社区市场**立即**出售给最高出价的订购单所获得的余额折扣(扣除手续费后)
- - ratio 表示此物品在 steam 社区市场竞价出售**可能**获得的最低余额折扣(扣除手续费后)
+ - `buff_id` 表示此物品 https://buff.163.com/market/goods?goods_id=2334 里面的 goods_id
+ - `price` 表示此物品在 buff 上的最低售价
+ - `sell/want` 表示此物品在 steam 社区市场上的 出售/求购 单数量
+ - `b_o_ratio` 表示此物品在 steam 社区市场**立即**出售给最高出价的订购单所获得的余额折扣(扣除手续费后)
+ - `ratio` 表示此物品在 steam 社区市场竞价出售**可能**获得的最低余额折扣(扣除手续费后)
 
 最后面这两个 ratio 就是上述的差价阈值, 这个值越低越好, 越低表示你通过这笔交易获得了这个折扣的 steam 钱包余额
 
@@ -34,8 +32,7 @@ buff2steam 是一个爬虫脚本, 用于爬取 [网易buff](https://buff.163.com
 
 ## 先决条件
 
- - 使用本脚本前**必须**了解科学上网相关知识
- - [Python3 + pip](https://www.python.org/) 环境
+ - [Python](https://www.python.org/) 环境
  - DIY 能力, 因为脚本的配置是因人而异的
 
 ## 依赖
