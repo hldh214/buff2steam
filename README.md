@@ -1,3 +1,9 @@
+## Disclaimer
+
+Recently there are many people told me that buff is banning accounts that use this project.
+
+So be careful and take your own risk to enjoy~
+
 <p align="center">
   <b>Special thanks to the generous sponsorship by:</b>
   <br><br>
@@ -6,6 +12,7 @@
   </a>
   <br><br>
 </p>
+
 
 # buff2steam
 
