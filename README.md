@@ -1,5 +1,7 @@
 ## Disclaimer
 
+![image](https://user-images.githubusercontent.com/5501843/124080326-d2a8a680-da7c-11eb-9c24-51eef65c14f6.png)
+
 Recently there are many people told me that buff is banning accounts that use this project.
 
 So be careful and take your own risk to enjoy~
