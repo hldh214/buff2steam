@@ -1,9 +1,8 @@
-import argparse
+import asyncio
 import decimal
-import json
 
-import trio
-
+import buff2steam.exceptions
+from buff2steam import config, logger
 from buff2steam.provider.buff import Buff
 from buff2steam.provider.steam import Steam
 
@@ -12,22 +11,14 @@ def remove_exponent(d):
     return d.quantize(decimal.Decimal(1)) if d == d.to_integral() else d.normalize()
 
 
-async def _main(config):
-    buff = Buff(
-        config['main']['game'],
-        config['main']['game_appid'],
-        config['buff']['requests_kwargs']
-    )
-
-    steam = Steam(
-        game_appid=config['main']['game_appid'],
-        request_kwargs=config['steam']['requests_kwargs']
-    )
-
+async def main_loop(buff, steam):
     total_page = await buff.get_total_page()
     visited = set()
     for each_page in range(1, total_page + 1):
+        logger.debug(f'page: {each_page} / {total_page}...')
         items = await buff.get_items(each_page)
+        logger.debug(f'items: {items}')
+        logger.debug(f'got {len(items)} items')
         for item in items:
             if item['id'] in visited:
                 continue
@@ -37,18 +28,21 @@ async def _main(config):
             buff_says_steam_price = remove_exponent(decimal.Decimal(item['goods_info']['steam_price_cny']) * 100)
 
             if not config['main']['max_price'] > buff_min_price > config['main']['min_price']:
+                logger.debug(f'buff_min_price: {buff_min_price} not in range')
                 continue
 
             buff_says_ratio = buff_min_price / buff_says_steam_price if buff_says_steam_price else 1
             if buff_says_ratio > decimal.Decimal(config['main']['accept_buff_threshold']):
+                logger.debug(f'buff_says_ratio: {buff_says_ratio} > {config["main"]["accept_buff_threshold"]}')
                 continue
 
             try:
-                # todo: gather
                 listings_data = await steam.listings_data(market_hash_name)
-            except Exception as exception:
-                print(exception)
-                await trio.sleep(config['steam']['request_interval'])
+            except buff2steam.exceptions.SteamError:
+                logger.warning(
+                    f'failed to get listings data for ({market_hash_name}), '
+                    f'waiting {config["steam"]["request_interval"]} seconds...'
+                )
                 continue
 
             current_ratio = buff_min_price / listings_data['converted_price']
@@ -62,7 +56,7 @@ async def _main(config):
 
             visited.add(item['id'])
 
-            print(' '.join([
+            logger.info(' '.join([
                 'buff_id/price: {buff_id}/{buff_price};'.format(
                     buff_id=item['id'], buff_price=buff_min_price_human
                 ),
@@ -74,26 +68,24 @@ async def _main(config):
                 )
             ]))
 
-            await trio.sleep(config['steam']['request_interval'])
 
-
-async def trio_wrapper():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-c', '--config', help='config path', default='./config.json')
-    args = parser.parse_args()
-    with open(args.config) as fp:
-        config = json.load(fp)
-
+async def main():
     try:
         while True:
-            await _main(config)
+            async with Buff(
+                    game=config['main']['game'],
+                    game_appid=config['main']['game_appid'],
+                    request_interval=config['buff']['request_interval'],
+                    request_kwargs=config['buff']['requests_kwargs'],
+            ) as buff, Steam(
+                game_appid=config['main']['game_appid'],
+                request_interval=config['steam']['request_interval'],
+                request_kwargs=config['steam']['requests_kwargs'],
+            ) as steam:
+                await main_loop(buff, steam)
     except KeyboardInterrupt:
         exit('Bye~')
 
 
-def main():
-    trio.run(trio_wrapper)
-
-
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())

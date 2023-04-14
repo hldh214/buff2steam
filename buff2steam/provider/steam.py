@@ -1,6 +1,11 @@
+import asyncio
 import re
+import time
 
 import httpx
+
+import buff2steam.exceptions
+from buff2steam import logger
 
 
 class Steam:
@@ -15,7 +20,12 @@ class Steam:
     item_nameid_pattern = re.compile(r'Market_LoadOrderSpread\(\s*(\d+)\s*\)')
     wanted_cnt_pattern = re.compile(r'<span\s*class="market_commodity_orders_header_promote">(\d+)</span>')
 
-    def __init__(self, asf_config=None, steam_id=None, game_appid='', context_id=2, request_kwargs=None):
+    def __init__(
+            self, asf_config=None, steam_id=None, game_appid='', context_id=2,
+            request_interval=30, request_kwargs=None
+    ):
+        self.request_interval = request_interval
+        self.request_locks = {}  # {url: [asyncio.Lock, last_request_time]}
         self.opener = httpx.AsyncClient(base_url=self.base_url, **request_kwargs)
         self.asf_config = asf_config
         self.game_appid = game_appid
@@ -28,14 +38,34 @@ class Steam:
         self.web_listings = self.web_listings.replace('{game_appid}', game_appid)
         self.web_listings_render = self.web_listings_render.replace('{game_appid}', game_appid)
 
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        await self.opener.aclose()
+
+    async def request(self, *args, **kwargs):
+        url = kwargs.get('url', args[1])
+        if url not in self.request_locks:
+            self.request_locks[url] = [asyncio.Lock(), 0]
+
+        async with self.request_locks[url][0]:
+            elapsed = time.monotonic() - self.request_locks[url][1]
+            if elapsed < self.request_interval:
+                logger.debug(f'Waiting {self.request_interval - elapsed:.2f} seconds before next request({url})...')
+                await asyncio.sleep(self.request_interval - elapsed)
+            self.request_locks[url][1] = time.monotonic()
+
+            return await self.opener.request(*args, **kwargs)
+
     async def listings_data(self, market_hash_name):
-        res = await self.opener.get(self.web_listings_render.format(market_hash_name=market_hash_name), params={
+        res = await self.request('GET', self.web_listings_render.format(market_hash_name=market_hash_name), params={
             'count': 1,
             'currency': 23
         })
 
         if res.status_code == 429:
-            raise Exception('steam_api_429')
+            raise buff2steam.exceptions.SteamAPI429Error()
 
         res = res.json()
 
@@ -50,11 +80,11 @@ class Steam:
         }
 
     async def orders_data(self, market_hash_name):
-        res = await self.opener.get(self.web_listings.format(market_hash_name=market_hash_name))
+        res = await self.request('GET', self.web_listings.format(market_hash_name=market_hash_name))
 
         item_nameid = self.item_nameid_pattern.findall(res.text)[0]
 
-        res = await self.opener.get(self.steam_order_api, params={
+        res = await self.request('GET', self.steam_order_api, params={
             'language': 'schinese',
             'currency': 23,
             'item_nameid': item_nameid,

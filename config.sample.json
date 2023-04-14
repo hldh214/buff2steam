@@ -1,24 +1,27 @@
 {
-    "main": {
-        "game": "dota2",
-        "game_appid": "570",
-        "accept_buff_threshold": 0.65,
-        "min_price": 500,
-        "max_price": 30000
-    },
-    "buff": {
-        "requests_kwargs": {
-            "headers": {
-                "cookie": "session=1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxx"
-            }
-        }
-    },
-    "steam": {
-        "request_interval": 20,
-        "requests_kwargs": {
-            "proxies": {
-                "https": "http://127.0.0.1:1080"
-            }
-        }
+  "main": {
+    "debug": true,
+    "game": "dota2",
+    "game_appid": "570",
+    "accept_buff_threshold": 0.65,
+    "min_price": 500,
+    "max_price": 30000
+  },
+  "buff": {
+    "request_interval": 10,
+    "requests_kwargs": {
+      "headers": {
+        "cookie": "session=1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxx",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
+      }
     }
+  },
+  "steam": {
+    "request_interval": 30,
+    "requests_kwargs": {
+      "headers": {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
+      }
+    }
+  }
 }
