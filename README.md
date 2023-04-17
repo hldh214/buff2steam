@@ -9,7 +9,7 @@
 
 # Buff2steam
 
-[![Build and release](https://github.com/hldh214/t1/actions/workflows/build-and-release.yml/badge.svg)](https://github.com/hldh214/t1/actions/workflows/build-and-release.yml)
+[![Build and release](https://github.com/hldh214/buff2steam/actions/workflows/build-and-release.yml/badge.svg)](https://github.com/hldh214/buff2steam/actions/workflows/build-and-release.yml)
 
 Welcome to buff2steam, a Python script for finding items on buff that are cheaper than on Steam Community Market.
 This readme provides an overview of the project and instructions on how to use it.
@@ -84,7 +84,7 @@ pipenv run python -m buff2steam
 
 ## Run with Docker
 
-[![Docker Image](https://github.com/hldh214/t1/actions/workflows/docker-image.yml/badge.svg)](https://github.com/hldh214/t1/actions/workflows/docker-image.yml)
+[![Docker Image](https://github.com/hldh214/buff2steam/actions/workflows/docker-image.yml/badge.svg)](https://github.com/hldh214/buff2steam/actions/workflows/docker-image.yml)
 
 ```shell
 # Build image yourself
