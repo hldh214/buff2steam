@@ -1,4 +1,4 @@
-<p style="text-align: center;">
+<p align="center">
   <b>Special thanks to the generous sponsorship by:</b>
   <br><br>
   <a target="_blank" href="https://jb.gg/OpenSourceSupport">
