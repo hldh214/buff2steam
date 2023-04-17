@@ -92,7 +92,7 @@ docker buildx build -t buff2steam_local .
 docker run -e buff2steam_local
 
 # Or use prebuilt image
-docker run -v $PWD/config.json:/app/config.json ghcr.io/hldh214/buff2steam
+docker run -it --name buff2steam --rm -v $PWD/config.json:/app/config.json ghcr.io/hldh214/buff2steam
 ```
 
 ## Configuration
