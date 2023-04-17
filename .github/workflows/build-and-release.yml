@@ -18,19 +18,20 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.10'
           architecture: 'x${{ env.ARCH }}'
 
       - name: Install requirements
-        run: python -m pip install -r requirements.txt PyInstaller
+        run: python -m pip install --user pipenv PyInstaller
+      - run: pipenv install
 
       - name: Run PyInstaller
         run: python -m PyInstaller -F buff2steam/__main__.py -n "${{ env.OUTPUT_EXE_NAME }}.${{ github.ref_name }}.x${{ env.ARCH }}"
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ env.OUTPUT_EXE_NAME }}.${{ github.ref_name }}.x${{ env.ARCH }}.exe
           path: dist/${{ env.OUTPUT_EXE_NAME }}.${{ github.ref_name }}.x${{ env.ARCH }}.exe
@@ -44,19 +45,20 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.10'
           architecture: 'x${{ env.ARCH }}'
 
       - name: Install requirements
-        run: python -m pip install -r requirements.txt PyInstaller
+        run: python -m pip install --user pipenv PyInstaller
+      - run: pipenv install
 
       - name: Run PyInstaller
-        run: python -m PyInstaller --add-data "lokbot/assets/;lokbot/assets" -F lokbot/__main__.py -n "${{ env.OUTPUT_EXE_NAME }}.${{ github.ref_name }}.x${{ env.ARCH }}"
+        run: python -m PyInstaller -F buff2steam/__main__.py -n "${{ env.OUTPUT_EXE_NAME }}.${{ github.ref_name }}.x${{ env.ARCH }}"
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ env.OUTPUT_EXE_NAME }}.${{ github.ref_name }}.x${{ env.ARCH }}.exe
           path: dist/${{ env.OUTPUT_EXE_NAME }}.${{ github.ref_name }}.x${{ env.ARCH }}.exe
@@ -66,7 +68,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Download all artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           path: assets
 
