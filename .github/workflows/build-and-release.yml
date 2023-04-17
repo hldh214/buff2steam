@@ -1,0 +1,86 @@
+name: Build and release
+
+on:
+  push:
+    tags: [ '*' ]
+
+env:
+  OUTPUT_EXE_NAME: buff2steam
+
+jobs:
+  build-windows-x86:
+    runs-on: windows-2019
+    env:
+      ARCH: '86'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
+          architecture: 'x${{ env.ARCH }}'
+
+      - name: Install requirements
+        run: python -m pip install -r requirements.txt PyInstaller
+
+      - name: Run PyInstaller
+        run: python -m PyInstaller -F buff2steam/__main__.py -n "${{ env.OUTPUT_EXE_NAME }}.${{ github.ref_name }}.x${{ env.ARCH }}"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.OUTPUT_EXE_NAME }}.${{ github.ref_name }}.x${{ env.ARCH }}.exe
+          path: dist/${{ env.OUTPUT_EXE_NAME }}.${{ github.ref_name }}.x${{ env.ARCH }}.exe
+
+  build-windows-x64:
+    runs-on: windows-2019
+    env:
+      ARCH: '64'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
+          architecture: 'x${{ env.ARCH }}'
+
+      - name: Install requirements
+        run: python -m pip install -r requirements.txt PyInstaller
+
+      - name: Run PyInstaller
+        run: python -m PyInstaller --add-data "lokbot/assets/;lokbot/assets" -F lokbot/__main__.py -n "${{ env.OUTPUT_EXE_NAME }}.${{ github.ref_name }}.x${{ env.ARCH }}"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.OUTPUT_EXE_NAME }}.${{ github.ref_name }}.x${{ env.ARCH }}.exe
+          path: dist/${{ env.OUTPUT_EXE_NAME }}.${{ github.ref_name }}.x${{ env.ARCH }}.exe
+
+  release:
+    needs: [ 'build-windows-x86', 'build-windows-x64' ]
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Download all artifact
+        uses: actions/download-artifact@v2
+        with:
+          path: assets
+
+      - name: Calculate artifact's hash
+        id: hash
+        run: |
+          dgst=$(openssl dgst -sha256 assets/**/${{ env.OUTPUT_EXE_NAME }}* | sed -E "s/assets\/.+?\///")
+          dgst="${dgst//'%'/'%25'}"
+          dgst="${dgst//$'\n'/'%0A'}"
+          dgst="${dgst//$'\r'/'%0D'}"
+          echo "::set-output name=hash::$dgst"
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body: ${{ steps.hash.outputs.hash }}
+          generate_release_notes: true
+          files: ${{ github.workspace }}/assets/**/${{ env.OUTPUT_EXE_NAME }}*

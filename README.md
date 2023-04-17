@@ -68,9 +68,30 @@ To use buff2steam, you need to have:
 
 ## Usage
 
-To run buff2steam, execute the following command in the terminal:
+```shell
+# Use the UTF-8 mode on Windows
+export PYTHONUTF8=1
 
-`python -m buff2steam`
+# activate a new shell with pipenv
+pipenv shell
+python -m buff2steam
+
+# or run directly inside pipenv
+pipenv run python -m buff2steam
+```
+
+## Run with Docker
+
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/hldh214/buff2steam/docker-image.yml?branch=master)](https://github.com/hldh214/buff2steam/pkgs/container/buff2steam)
+
+```shell
+# Build image yourself
+docker buildx build -t buff2steam_local .
+docker run -e buff2steam_local
+
+# Or use prebuilt image
+docker run -v $PWD/config.json:/app/config.json ghcr.io/hldh214/buff2steam
+```
 
 ## Configuration
 
