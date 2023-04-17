@@ -1,6 +1,7 @@
 name: Build and release
 
 on:
+  workflow_dispatch:
   push:
     tags: [ '*' ]
 
