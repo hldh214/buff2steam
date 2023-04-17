@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 httpx = "==0.*"
 loguru = "==0.*"
+tenacity = "==8.*"
 
 [dev-packages]
 

@@ -3,9 +3,12 @@ import re
 import time
 
 import httpx
+import tenacity
 
 import buff2steam.exceptions
 from buff2steam import logger
+
+import inspect
 
 
 class Steam:
@@ -15,7 +18,7 @@ class Steam:
     web_inventory = '/inventory/{steam_id}/{game_appid}/{context_id}'
     web_listings = '/market/listings/{game_appid}/{market_hash_name}'
     web_listings_render = web_listings + '/render'
-    steam_order_api = '/market/itemordershistogram'
+    web_item_orders_histogram = '/market/itemordershistogram'
 
     item_nameid_pattern = re.compile(r'Market_LoadOrderSpread\(\s*(\d+)\s*\)')
     wanted_cnt_pattern = re.compile(r'<span\s*class="market_commodity_orders_header_promote">(\d+)</span>')
@@ -25,7 +28,7 @@ class Steam:
             request_interval=30, request_kwargs=None
     ):
         self.request_interval = request_interval
-        self.request_locks = {}  # {url: [asyncio.Lock, last_request_time]}
+        self.request_locks = {}  # {caller: [asyncio.Lock, last_request_time]}
         self.opener = httpx.AsyncClient(base_url=self.base_url, **request_kwargs)
         self.asf_config = asf_config
         self.game_appid = game_appid
@@ -44,30 +47,47 @@ class Steam:
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self.opener.aclose()
 
-    async def request(self, *args, **kwargs):
-        url = kwargs.get('url', args[1])
-        if url not in self.request_locks:
-            self.request_locks[url] = [asyncio.Lock(), 0]
+    async def _request(self, *args, **kwargs):
+        caller = inspect.stack()[1][3]
+        if caller not in self.request_locks:
+            self.request_locks[caller] = [asyncio.Lock(), 0]
 
-        async with self.request_locks[url][0]:
-            elapsed = time.monotonic() - self.request_locks[url][1]
+        async with self.request_locks[caller][0]:
+            elapsed = time.monotonic() - self.request_locks[caller][1]
             if elapsed < self.request_interval:
-                logger.debug(f'Waiting {self.request_interval - elapsed:.2f} seconds before next request({url})...')
+                logger.debug(f'Waiting {self.request_interval - elapsed:.2f} seconds before next request({caller})...')
                 await asyncio.sleep(self.request_interval - elapsed)
-            self.request_locks[url][1] = time.monotonic()
+            self.request_locks[caller][1] = time.monotonic()
 
-            return await self.opener.request(*args, **kwargs)
+            res = await self.opener.request(*args, **kwargs)
 
-    async def listings_data(self, market_hash_name):
-        res = await self.request('GET', self.web_listings_render.format(market_hash_name=market_hash_name), params={
+            if res.status_code == 429 or 'too many requests' in res.text:
+                logger.debug(f'429 Too Many Requests: {caller}')
+                raise buff2steam.exceptions.SteamAPI429Error()
+
+            return res
+
+    @tenacity.retry(retry=tenacity.retry_if_exception_type(buff2steam.exceptions.SteamAPI429Error))
+    async def _web_listings_render(self, market_hash_name):
+        return await self._request('GET', self.web_listings_render.format(market_hash_name=market_hash_name), params={
             'count': 1,
             'currency': 23
         })
 
-        if res.status_code == 429:
-            raise buff2steam.exceptions.SteamAPI429Error()
+    @tenacity.retry(retry=tenacity.retry_if_exception_type(buff2steam.exceptions.SteamAPI429Error))
+    async def _web_listings(self, market_hash_name):
+        return await self._request('GET', self.web_listings.format(market_hash_name=market_hash_name))
 
-        res = res.json()
+    @tenacity.retry(retry=tenacity.retry_if_exception_type(buff2steam.exceptions.SteamAPI429Error))
+    async def _item_orders_histogram(self, item_nameid):
+        return await self._request('GET', self.web_item_orders_histogram, params={
+            'language': 'schinese',
+            'currency': 23,
+            'item_nameid': item_nameid,
+        })
+
+    async def listings_data(self, market_hash_name):
+        res = (await self._web_listings_render(market_hash_name)).json()
 
         listinginfo = res['listinginfo'][next(iter(res['listinginfo']))]
         converted_price = listinginfo['converted_price']
@@ -80,15 +100,14 @@ class Steam:
         }
 
     async def orders_data(self, market_hash_name):
-        res = await self.request('GET', self.web_listings.format(market_hash_name=market_hash_name))
+        res = await self._web_listings(market_hash_name)
 
-        item_nameid = self.item_nameid_pattern.findall(res.text)[0]
+        item_nameid = self.item_nameid_pattern.findall(res.text)
+        if not item_nameid:
+            logger.critical(res.text)
+            raise buff2steam.exceptions.SteamItemNameIdNotFoundError()
 
-        res = await self.request('GET', self.steam_order_api, params={
-            'language': 'schinese',
-            'currency': 23,
-            'item_nameid': item_nameid,
-        })
+        res = await self._item_orders_histogram(item_nameid[0])
 
         orders_data = res.json()
 

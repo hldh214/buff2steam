@@ -1,7 +1,6 @@
 import asyncio
 import decimal
 
-import buff2steam.exceptions
 from buff2steam import config, logger
 from buff2steam.provider.buff import Buff
 from buff2steam.provider.steam import Steam
@@ -17,8 +16,7 @@ async def main_loop(buff, steam):
     for each_page in range(1, total_page + 1):
         logger.debug(f'page: {each_page} / {total_page}...')
         items = await buff.get_items(each_page)
-        logger.debug(f'items: {items}')
-        logger.debug(f'got {len(items)} items')
+        logger.debug(f'got {len(items)} items: {items}')
         for item in items:
             if item['id'] in visited:
                 continue
@@ -28,25 +26,20 @@ async def main_loop(buff, steam):
             buff_says_steam_price = remove_exponent(decimal.Decimal(item['goods_info']['steam_price_cny']) * 100)
 
             if not config['main']['max_price'] > buff_min_price > config['main']['min_price']:
-                logger.debug(f'buff_min_price: {buff_min_price} not in range')
+                logger.debug(f'{market_hash_name}: buff_min_price({buff_min_price}) not in range, skipping...')
                 continue
 
             buff_says_ratio = buff_min_price / buff_says_steam_price if buff_says_steam_price else 1
-            if buff_says_ratio > decimal.Decimal(config['main']['accept_buff_threshold']):
-                logger.debug(f'buff_says_ratio: {buff_says_ratio} > {config["main"]["accept_buff_threshold"]}')
-                continue
-
-            try:
-                listings_data = await steam.listings_data(market_hash_name)
-            except buff2steam.exceptions.SteamError:
-                logger.warning(
-                    f'failed to get listings data for ({market_hash_name}), '
-                    f'waiting {config["steam"]["request_interval"]} seconds...'
+            accept_buff_threshold = decimal.Decimal(config['main']['accept_buff_threshold'])
+            if buff_says_ratio > accept_buff_threshold:
+                logger.debug(
+                    f'{market_hash_name}: {buff_says_ratio} > {accept_buff_threshold}, skipping...'
                 )
                 continue
 
+            logger.debug(f'Processing {market_hash_name}...')
+            listings_data = await steam.listings_data(market_hash_name)
             current_ratio = buff_min_price / listings_data['converted_price']
-
             orders_data = await steam.orders_data(market_hash_name)
             highest_buy_order = decimal.Decimal(orders_data['highest_buy_order'])
             wanted_cnt = orders_data['wanted_cnt']
