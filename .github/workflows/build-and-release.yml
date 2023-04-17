@@ -24,11 +24,12 @@ jobs:
           architecture: 'x${{ env.ARCH }}'
 
       - name: Install requirements
-        run: python -m pip install pipenv PyInstaller
-      - run: pipenv install
+        run: python -m pip install pipenv
+      - run: pipenv sync
+      - run: pipenv install PyInstaller
 
       - name: Run PyInstaller
-        run: python -m PyInstaller -F buff2steam/__main__.py -n "${{ env.OUTPUT_EXE_NAME }}.${{ github.ref_name }}.x${{ env.ARCH }}"
+        run: pipenv run python -m PyInstaller -F buff2steam/__main__.py -n "${{ env.OUTPUT_EXE_NAME }}.${{ github.ref_name }}.x${{ env.ARCH }}"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
@@ -51,11 +52,12 @@ jobs:
           architecture: 'x${{ env.ARCH }}'
 
       - name: Install requirements
-        run: python -m pip install pipenv PyInstaller
-      - run: pipenv install
+        run: python -m pip install pipenv
+      - run: pipenv sync
+      - run: pipenv install PyInstaller
 
       - name: Run PyInstaller
-        run: python -m PyInstaller -F buff2steam/__main__.py -n "${{ env.OUTPUT_EXE_NAME }}.${{ github.ref_name }}.x${{ env.ARCH }}"
+        run: pipenv run python -m PyInstaller -F buff2steam/__main__.py -n "${{ env.OUTPUT_EXE_NAME }}.${{ github.ref_name }}.x${{ env.ARCH }}"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
