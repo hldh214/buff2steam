@@ -49,8 +49,7 @@ The output includes:
 - `buff_id`: `goods_id` in url: https://buff.163.com/market/goods?goods_id=2334
 - `price`: item price on buff
 - `sell/want`: item sell/buy order count on steamcommunity market
-- `b_o_ratio`: ratio obtained by selling this item to the highest buy order in the steamcommunity market **immediately
-  ** (transaction fee included)
+- `b_o_ratio`: ratio obtained by selling this item to the highest buy order in the steamcommunity market **immediately** (transaction fee included)
 - `ratio`: **possible** ratio obtained by selling this item with the lowest sell order price in the steamcommunity
   market (transaction fee included)
 
