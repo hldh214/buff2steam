@@ -5,6 +5,7 @@ import time
 import httpx
 
 from buff2steam import logger
+from buff2steam.exceptions import BuffError
 
 
 class Buff:
@@ -51,7 +52,7 @@ class Buff:
 
             response = await self.opener.request(*args, **kwargs)
             if response.json()['code'] != 'OK':
-                raise Exception(response.json())
+                raise BuffError(response.json())
 
             return response.json()['data']
 

@@ -1,4 +1,5 @@
 import asyncio
+import decimal
 import re
 import time
 
@@ -13,19 +14,19 @@ import inspect
 
 class Steam:
     base_url = 'https://steamcommunity.com'
+    fee_rate = 0.15
 
     web_sell = '/market/sellitem'
     web_inventory = '/inventory/{steam_id}/{game_appid}/{context_id}'
     web_listings = '/market/listings/{game_appid}/{market_hash_name}'
-    web_listings_render = web_listings + '/render'
     web_item_orders_histogram = '/market/itemordershistogram'
 
     item_nameid_pattern = re.compile(r'Market_LoadOrderSpread\(\s*(\d+)\s*\)')
-    wanted_cnt_pattern = re.compile(r'<span\s*class="market_commodity_orders_header_promote">(\d+)</span>')
+    currency_pattern = re.compile(r'[^\d.]')
 
     def __init__(
             self, asf_config=None, steam_id=None, game_appid='', context_id=2,
-            request_interval=30, request_kwargs=None
+            request_interval=4, request_kwargs=None
     ):
         self.request_interval = request_interval
         self.request_locks = {}  # {caller: [asyncio.Lock, last_request_time]}
@@ -39,7 +40,6 @@ class Steam:
             context_id=context_id
         )
         self.web_listings = self.web_listings.replace('{game_appid}', game_appid)
-        self.web_listings_render = self.web_listings_render.replace('{game_appid}', game_appid)
 
     async def __aenter__(self):
         return self
@@ -68,35 +68,36 @@ class Steam:
             return res
 
     @tenacity.retry(retry=tenacity.retry_if_exception_type(buff2steam.exceptions.SteamAPI429Error))
-    async def _web_listings_render(self, market_hash_name):
-        return await self._request('GET', self.web_listings_render.format(market_hash_name=market_hash_name), params={
-            'count': 1,
-            'currency': 23
-        })
-
-    @tenacity.retry(retry=tenacity.retry_if_exception_type(buff2steam.exceptions.SteamAPI429Error))
     async def _web_listings(self, market_hash_name):
         return await self._request('GET', self.web_listings.format(market_hash_name=market_hash_name))
 
-    @tenacity.retry(retry=tenacity.retry_if_exception_type(buff2steam.exceptions.SteamAPI429Error))
     async def _item_orders_histogram(self, item_nameid):
         return await self._request('GET', self.web_item_orders_histogram, params={
             'language': 'schinese',
             'currency': 23,
             'item_nameid': item_nameid,
+            'norender': 1,
+            'country': 'CN',
+            'two_factor': 0
         })
 
-    async def listings_data(self, market_hash_name):
-        res = (await self._web_listings_render(market_hash_name)).json()
+    async def _price_overview(self, market_hash_name):
+        return await self._request('GET', '/market/priceoverview', params={
+            'appid': self.game_appid,
+            'market_hash_name': market_hash_name,
+            'currency': 23,
+        })
 
-        listinginfo = res['listinginfo'][next(iter(res['listinginfo']))]
-        converted_price = listinginfo['converted_price']
-        converted_fee = listinginfo['converted_fee']
+    async def price_overview_data(self, market_hash_name):
+        res = (await self._price_overview(market_hash_name)).json()
+
+        if 'lowest_price' not in res:
+            logger.debug(f'{market_hash_name}: {res}')
+            return None
 
         return {
-            'converted_price': converted_price,
-            'total_count': res['total_count'],
-            'steam_tax_ratio': converted_price / (converted_price + converted_fee)
+            'price': int(decimal.Decimal(self.currency_pattern.sub('', res['lowest_price'])) * 100),
+            'volume': int(res.get('volume', '0').replace(',', '')),
         }
 
     async def orders_data(self, market_hash_name):
@@ -107,11 +108,17 @@ class Steam:
             logger.critical(res.text)
             raise buff2steam.exceptions.SteamItemNameIdNotFoundError()
 
-        res = await self._item_orders_histogram(item_nameid[0])
+        try:
+            res = await self._item_orders_histogram(item_nameid[0])
+        except buff2steam.exceptions.SteamAPI429Error:
+            logger.debug(f'SteamAPI429Error({market_hash_name}): Could not get orders data, skipping...')
+            return None
 
         orders_data = res.json()
 
         return {
-            'highest_buy_order': orders_data['highest_buy_order'],
-            'wanted_cnt': self.wanted_cnt_pattern.findall(orders_data['buy_order_summary'])[0]
+            'sell_order_count': int(orders_data['sell_order_count'].replace(',', '')),
+            'buy_order_count': int(orders_data['buy_order_count'].replace(',', '')),
+            'lowest_sell_order': int(orders_data['lowest_sell_order']),
+            'highest_buy_order': int(orders_data['highest_buy_order']),
         }
