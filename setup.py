@@ -5,7 +5,7 @@ with open("README.md", 'r') as f:
 
 setup(
     name='buff2steam',
-    version='0.3.1',
+    version='0.4.0',
     python_requires='>=3.7',
     url='https://github.com/hldh214/buff2steam',
     license='Unlicense',
@@ -13,9 +13,9 @@ setup(
     long_description=long_description,
     packages=['buff2steam'],
     install_requires=[
-        'httpx',
-        'loguru',
-        'tenacity'
+        'httpx==0.*',
+        'loguru==0.*',
+        'tenacity==8.*'
     ],
     author='Jim',
     author_email='hldh214@gmail.com',
