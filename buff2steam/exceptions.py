@@ -8,3 +8,7 @@ class SteamAPI429Error(SteamError):
 
 class SteamItemNameIdNotFoundError(SteamError):
     pass
+
+
+class BuffError(Exception):
+    pass

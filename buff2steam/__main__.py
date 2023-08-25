@@ -6,10 +6,6 @@ from buff2steam.provider.buff import Buff
 from buff2steam.provider.steam import Steam
 
 
-def remove_exponent(d):
-    return d.quantize(decimal.Decimal(1)) if d == d.to_integral() else d.normalize()
-
-
 async def main_loop(buff, steam):
     total_page = await buff.get_total_page()
     visited = set()
@@ -22,15 +18,15 @@ async def main_loop(buff, steam):
                 continue
 
             market_hash_name = item['market_hash_name']
-            buff_min_price = remove_exponent(decimal.Decimal(item['sell_min_price']) * 100)
-            buff_says_steam_price = remove_exponent(decimal.Decimal(item['goods_info']['steam_price_cny']) * 100)
+            buff_min_price = int(decimal.Decimal(item['sell_min_price']) * 100)
+            buff_says_steam_price = int(decimal.Decimal(item['goods_info']['steam_price_cny']) * 100)
 
             if not config['main']['max_price'] > buff_min_price > config['main']['min_price']:
                 logger.debug(f'{market_hash_name}: buff_min_price({buff_min_price}) not in range, skipping...')
                 continue
 
             buff_says_ratio = buff_min_price / buff_says_steam_price if buff_says_steam_price else 1
-            accept_buff_threshold = decimal.Decimal(config['main']['accept_buff_threshold'])
+            accept_buff_threshold = config['main']['accept_buff_threshold']
             if buff_says_ratio > accept_buff_threshold:
                 logger.debug(
                     f'{market_hash_name}: {buff_says_ratio} > {accept_buff_threshold}, skipping...'
@@ -38,28 +34,33 @@ async def main_loop(buff, steam):
                 continue
 
             logger.debug(f'Processing {market_hash_name}...')
-            listings_data = await steam.listings_data(market_hash_name)
-            current_ratio = buff_min_price / listings_data['converted_price']
-            orders_data = await steam.orders_data(market_hash_name)
-            highest_buy_order = decimal.Decimal(orders_data['highest_buy_order'])
-            wanted_cnt = orders_data['wanted_cnt']
-            steam_tax_ratio = decimal.Decimal(listings_data['steam_tax_ratio'])
-            highest_buy_order_ratio = buff_min_price / (highest_buy_order * steam_tax_ratio)
+
+            price_overview_data = await steam.price_overview_data(market_hash_name)
+            if price_overview_data is None:
+                continue
+
+            volume = price_overview_data['volume']
+            orders_data = None
+            if volume > 0:
+                orders_data = await steam.orders_data(market_hash_name)
+
+            current_ratio = buff_min_price / (price_overview_data['price'] / (1 + steam.fee_rate))
             buff_min_price_human = float(buff_min_price / 100)
+
+            result = [
+                f'buff_id/price: {item["id"]}/{buff_min_price_human};',
+            ]
+
+            if orders_data is None:
+                result.append(f'volume: {volume}; ratio: {current_ratio:04.2f}')
+            else:
+                b_o_ratio = buff_min_price / (orders_data['highest_buy_order'] / (1 + steam.fee_rate))
+                result.append(f'sell/want: {orders_data["sell_order_count"]}/{orders_data["buy_order_count"]};')
+                result.append(f'volume: {volume}; b_o_ratio: {b_o_ratio:04.2f}; ratio: {current_ratio:04.2f}')
 
             visited.add(item['id'])
 
-            logger.info(' '.join([
-                'buff_id/price: {buff_id}/{buff_price};'.format(
-                    buff_id=item['id'], buff_price=buff_min_price_human
-                ),
-                'sell/want: {sell}/{want};'.format(
-                    sell=listings_data['total_count'], want=wanted_cnt
-                ),
-                'b_o_ratio: {b_o_ratio:04.2f}; ratio: {ratio:04.2f}'.format(
-                    b_o_ratio=highest_buy_order_ratio, ratio=current_ratio
-                )
-            ]))
+            logger.info(' '.join(result))
 
 
 async def main():
