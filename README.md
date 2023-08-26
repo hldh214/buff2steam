@@ -101,6 +101,7 @@ docker run -it --name buff2steam --rm -v $PWD/config.json:/app/config.json ghcr.
 ```json5
 {
   "main": {
+    "debug": true, // false
     "game": "csgo",  // dota2
     "game_appid": "730",  // 570
     "accept_buff_threshold": 0.65,  // acceptable ratio
@@ -111,12 +112,21 @@ docker run -it --name buff2steam --rm -v $PWD/config.json:/app/config.json ghcr.
     "request_interval": 4,  // buff api request interval (in seconds)
     "requests_kwargs": {
       "headers": {
-        "cookie": "session=1-GyCKVt_sSLoNtu2yeM9hY8FPeWTr8Q6ayOYIifqxKLM82044786689"
+        "cookie": "session=1-GyCKVt_sSLoNtu2yeM9hY8FPeWTr8Q6ayOYIifqxKLM82044786689",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36",
+        "Referer": "https://buff.163.com/market/dota2",
+        "X-Requested-With": "XMLHttpRequest"
       }
     }
   },
   "steam": {
-    "request_interval": 20,  // steam api request interval (in seconds)
+    "min_volume": 0, //minimal number of sales in 24 hours for an item to be viable
+    "request_interval": 4,  // steam api request interval (in seconds)
+    "requests_kwargs": {
+      "headers": {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
+      }
+    }
   }
 }
 ```
