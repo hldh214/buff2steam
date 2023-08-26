@@ -6,7 +6,7 @@ from buff2steam.provider.buff import Buff
 from buff2steam.provider.steam import Steam
 
 
-async def main_loop(buff, steam):
+async def main_loop(buff, steam,min_volume):
     total_page = await buff.get_total_page()
     visited = set()
     for each_page in range(1, total_page + 1):
@@ -40,6 +40,10 @@ async def main_loop(buff, steam):
                 continue
 
             volume = price_overview_data['volume']
+            if min_volume > volume:
+                logger.debug(f'{market_hash_name}: volume: {min_volume} > {volume}, skipping.')
+                continue
+
             orders_data = None
             if volume > 0:
                 orders_data = await steam.orders_data(market_hash_name)
@@ -66,6 +70,7 @@ async def main_loop(buff, steam):
 async def main():
     try:
         while True:
+            min_volume = config['steam']['min_volume']
             async with Buff(
                     game=config['main']['game'],
                     game_appid=config['main']['game_appid'],
@@ -76,7 +81,7 @@ async def main():
                 request_interval=config['steam']['request_interval'],
                 request_kwargs=config['steam']['requests_kwargs'],
             ) as steam:
-                await main_loop(buff, steam)
+                await main_loop(buff, steam, min_volume)
     except KeyboardInterrupt:
         exit('Bye~')
 
