@@ -121,6 +121,7 @@ docker run -it --name buff2steam --rm -v $PWD/config.json:/app/config.json ghcr.
   },
   "steam": {
     "min_volume": 0, //minimal number of sales in 24 hours for an item to be viable
+    "min_ration_for_buyorder": 1, //minimal ration before checking buy order prices
     "request_interval": 4,  // steam api request interval (in seconds)
     "requests_kwargs": {
       "headers": {

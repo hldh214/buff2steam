@@ -6,7 +6,7 @@ from buff2steam.provider.buff import Buff
 from buff2steam.provider.steam import Steam
 
 
-async def main_loop(buff, steam,min_volume):
+async def main_loop(buff, steam, min_volume, min_ration_for_buyorder):
     total_page = await buff.get_total_page()
     visited = set()
     for each_page in range(1, total_page + 1):
@@ -44,12 +44,13 @@ async def main_loop(buff, steam,min_volume):
                 logger.debug(f'{market_hash_name}: volume: {min_volume} > {volume}, skipping.')
                 continue
 
-            orders_data = None
-            if volume > 0:
-                orders_data = await steam.orders_data(market_hash_name)
-
             current_ratio = buff_min_price / (price_overview_data['price'] / (1 + steam.fee_rate))
             buff_min_price_human = float(buff_min_price / 100)
+
+            orders_data = None
+            if volume > 0:
+                if current_ratio > min_ration_for_buyorder:
+                    orders_data = await steam.orders_data(market_hash_name)
 
             result = [
                 f'buff_id/price: {item["id"]}/{buff_min_price_human};',
@@ -71,6 +72,7 @@ async def main():
     try:
         while True:
             min_volume = config['steam']['min_volume']
+            min_ration_for_buyorder = config['steam']['min_ration_for_buyorder']
             async with Buff(
                     game=config['main']['game'],
                     game_appid=config['main']['game_appid'],
@@ -81,7 +83,7 @@ async def main():
                 request_interval=config['steam']['request_interval'],
                 request_kwargs=config['steam']['requests_kwargs'],
             ) as steam:
-                await main_loop(buff, steam, min_volume)
+                await main_loop(buff, steam, min_volume, min_ration_for_buyorder)
     except KeyboardInterrupt:
         exit('Bye~')
 

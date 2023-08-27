@@ -20,6 +20,7 @@
   },
   "steam": {
     "min_volume": 0,
+    "min_ration_for_buyorder": 1,
     "request_interval": 4,
     "requests_kwargs": {
       "headers": {
