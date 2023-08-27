@@ -49,7 +49,7 @@ async def main_loop(buff, steam, min_volume, min_ration_for_buyorder):
 
             orders_data = None
             if volume > 0:
-                if current_ratio > min_ration_for_buyorder:
+                if current_ratio < min_ration_for_buyorder:
                     orders_data = await steam.orders_data(market_hash_name)
 
             result = [
