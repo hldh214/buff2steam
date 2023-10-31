@@ -105,6 +105,8 @@ docker run -it --name buff2steam --rm -v $PWD/config.json:/app/config.json ghcr.
     "game": "csgo",  // dota2
     "game_appid": "730",  // 570
     "accept_buff_threshold": 0.65,  // acceptable ratio
+    "accept_steam_threshold": 0.8,  // acceptable maximum ratio before fetching prices (in case of Steam API ratelimit)
+    "min_volume": 0,  // minimal number of sales in 24 hours for an item to be viable
     "min_price": 500,  // CNY, 500 == 5 yuan
     "max_price": 30000  // CNY, 30000 == 300 yuan
   },
@@ -120,8 +122,6 @@ docker run -it --name buff2steam --rm -v $PWD/config.json:/app/config.json ghcr.
     }
   },
   "steam": {
-    "min_volume": 0, //minimal number of sales in 24 hours for an item to be viable
-    "min_ration_for_buyorder": 1, //minimal ration before checking buy order prices
     "request_interval": 4,  // steam api request interval (in seconds)
     "requests_kwargs": {
       "headers": {
