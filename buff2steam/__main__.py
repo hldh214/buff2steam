@@ -40,12 +40,17 @@ async def main_loop(buff, steam):
                 continue
 
             volume = price_overview_data['volume']
-            orders_data = None
-            if volume > 0:
-                orders_data = await steam.orders_data(market_hash_name)
+            min_volume = config['main']['min_volume']
+            if volume < min_volume:
+                logger.debug(f'{market_hash_name}: volume: {volume} < {min_volume}, skipping.')
+                continue
 
             current_ratio = buff_min_price / (price_overview_data['price'] / (1 + steam.fee_rate))
             buff_min_price_human = float(buff_min_price / 100)
+
+            orders_data = None
+            if current_ratio < config['main']['accept_steam_threshold']:
+                orders_data = await steam.orders_data(market_hash_name)
 
             result = [
                 f'buff_id/price: {item["id"]}/{buff_min_price_human};',

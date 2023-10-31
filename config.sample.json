@@ -4,6 +4,8 @@
     "game": "dota2",
     "game_appid": "570",
     "accept_buff_threshold": 0.65,
+    "accept_steam_threshold": 0.8,
+    "min_volume": 0,
     "min_price": 500,
     "max_price": 30000
   },
