@@ -58,7 +58,7 @@ obtained the discounted steam wallet balance through this transaction.
 
 Then you can buy items from buff manually and sell them to the steamcommunity.
 ## Webgui
-A small webgui is hosted on [[127.0.0.1:1821](http://127.0.0.1:1821) (more work needed)
+A small webgui is hosted on [127.0.0.1:1821](http://127.0.0.1:1821) (more work needed)
 ## Requirements
 
 To use buff2steam, you need to have:
