@@ -15,7 +15,8 @@ setup(
     install_requires=[
         'httpx==0.*',
         'loguru==0.*',
-        'tenacity==8.*'
+        'tenacity==8.*',
+        'flask==3.*'
     ],
     author='Jim',
     author_email='hldh214@gmail.com',
