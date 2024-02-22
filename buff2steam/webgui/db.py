@@ -15,6 +15,7 @@ class _Item():
 class Items():
     def __init__(self) -> None:
         self.list :list[_Item] = []
+        self.latest_list = self.get_steam_decreasing
         self._current_item :_Item = None
         self._steam_increasing :list[_Item]= []
         self._steam_decreasing :list[_Item]= []
@@ -40,54 +41,80 @@ class Items():
         self._wipe_chached_lists()
         return
 
+    def delete_item(self, del_item):
+        for item in self.list:
+            if item.market_hash_name == del_item:
+                self.list.remove(item)
+                logger.debug(f'Removed {del_item} from database list')
+                self._wipe_chached_lists()
+                return
+        logger.debug(f'Item {del_item} not in databse')
+        return
+    
 ##Soring data
 
     def get_steam_increasing(self) -> "list[_Item]":
         if bool(self._steam_increasing):
+            self.latest_list = self.get_steam_increasing
             return self._steam_increasing
         self._steam_increasing = sorted(self.list, key=lambda item: item.steam_price)
+        self.latest_list = self.get_steam_increasing
         return self._steam_increasing
     
     def get_steam_decreasing(self) -> "list[_Item]":
         if bool(self._steam_decreasing):
+            self.latest_list = self.get_steam_decreasing
             return self._steam_decreasing
         self._steam_decreasing = self.get_steam_increasing()[::-1]
+        self.latest_list = self.get_steam_decreasing
         return self._steam_decreasing
 
     def get_buff_increasing(self) -> "list[_Item]":
         if bool(self._buff_increasing):
+            self.latest_list = self.get_buff_increasing
             return self._buff_increasing
         self._buff_increasing = sorted(self.list, key= lambda item: item.buff_price)
+        self.latest_list = self.get_buff_increasing
         return self._buff_increasing
     
     def get_buff_decreasing(self) -> "list[_Item]":
         if bool(self._buff_decreasing):
+            self.latest_list = self.get_buff_decreasing
             return self._buff_decreasing
         self._buff_decreasing = self.get_buff_increasing()[::-1]
+        self.latest_list = self.get_buff_decreasing
         return self._buff_decreasing
     
     def get_volume_increasing(self) -> "list[_Item]":
         if bool(self._volume_increasing):
+            self.latest_list = self.get_volume_increasing
             return self._volume_increasing
         self._volume_increasing = sorted(self.list, key= lambda item: item.volume)
+        self.latest_list = self.get_volume_increasing
         return self._volume_decreasing
     
     def get_volume_decreasing(self) -> "list[_Item]":
         if bool(self._volume_decreasing):
+            self.latest_list = self.get_volume_decreasing
             return self._volume_decreasing
         self._volume_decreasing = self.get_volume_increasing()[::-1]
+        self.latest_list = self.get_volume_decreasing
         return self._volume_decreasing
 
     def get_ratio_increasing(self) -> "list[_Item]":
         if bool(self._ratio_increasing):
+            self.latest_list = self.get_ratio_increasing
             return self._ratio_increasing
         self._ratio_increasing = sorted(self.list, key= lambda item: item.ratio)
+        self.latest_list = self.get_ratio_increasing
         return self._ratio_increasing
     
     def get_ratio_decreasing(self) -> "list[_Item]":
         if bool(self._ratio_decreasing):
+            self.latest_list = self.get_ratio_decreasing
             return self._ratio_decreasing
         self._ratio_decreasing = self.get_ratio_increasing()[::-1]
+        self.latest_list = self.get_ratio_decreasing
         return self._ratio_decreasing
 
 ##Done sorting data

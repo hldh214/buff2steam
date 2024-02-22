@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Blueprint
+from flask import Flask, render_template, Blueprint, request
 from buff2steam.webgui.db import items
 import threading
 
@@ -12,10 +12,6 @@ def start_app():
 @main.route("/")
 def index():
     return render_template("index.html")
-
-@main.route("/refresh")
-def refresh():
-    return render_template("add_items.html", results=items.list)
 
 #sorting
 
@@ -51,7 +47,15 @@ def sort_ratio_up():
 def sort_ratio_down():
     return render_template("add_items.html", results=items.get_ratio_decreasing())
 
+@main.route("/delete_item")
+def delete_item():
+    item_name = request.args.get("market_hash_name")
+    items.delete_item(item_name)
+    return render_template("add_items.html", results=items.latest_list())
 
+@main.route("/refresh")
+def events():
+    return render_template("add_items.html", results=items.latest_list())
 
 flask_thread = threading.Thread(target=start_app)
 flask_thread.start()

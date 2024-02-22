@@ -10,9 +10,6 @@
 </head>
 <section class="section">
   <div class="columns">
-    <div>
-      <button type="button" hx-get="/refresh" hx-target="#result">Refresh</button>
-    </div>
   </div>
   <table class="table is-fullwidth">
     <thead>
@@ -22,10 +19,10 @@
           <th>Steam Price<button type="button" hx-get="/sort_steam_up" hx-target="#result">↑</button><button type="button" hx-get="/sort_steam_down" hx-target="#result">↓</button></th>
           <th>Volume<button type="button" hx-get="/sort_volume_up" hx-target="#result">↑</button><button type="button" hx-get="/sort_volume_down" hx-target="#result">↓</button></th>
           <th>Ratio<button type="button" hx-get="/sort_ratio_up" hx-target="#result">↑</button><button type="button" hx-get="/sort_ratio_down" hx-target="#result">↓</button></th>
+          <th>Delete</th>
         </tr>
       </thead>
-      
-      <tbody id="result">
+      <tbody id="result" hx-get="/refresh" hx-trigger="every 1s">
       </tbody>
     </table>
   </section>
