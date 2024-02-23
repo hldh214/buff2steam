@@ -1,6 +1,6 @@
 from flask import Flask, render_template, Blueprint, request
 from buff2steam.webgui.db import items
-import threading
+import threading, logging
 
 main = Blueprint("main", __name__)
 
@@ -11,7 +11,7 @@ def start_app():
 
 @main.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", update_time = items.update_string)
 
 #sorting
 

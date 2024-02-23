@@ -89,4 +89,5 @@ async def main():
 
 
 if __name__ == '__main__':
+    db_items.set_update_time(config['main']['webgui_refresh_time'])
     asyncio.run(main())

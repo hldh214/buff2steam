@@ -109,7 +109,8 @@ docker run -it --name buff2steam --rm -v $PWD/config.json:/app/config.json ghcr.
     "accept_steam_threshold": 0.8,  // acceptable maximum ratio before fetching prices (in case of Steam API ratelimit)
     "min_volume": 0,  // minimal number of sales in 24 hours for an item to be viable
     "min_price": 500,  // CNY, 500 == 5 yuan
-    "max_price": 30000  // CNY, 30000 == 300 yuan
+    "max_price": 30000,  // CNY, 30000 == 300 yuan
+    "webgui_refresh_time": 1 // update time of webgui in seconds or false, for none
   },
   "buff": {
     "request_interval": 4,  // buff api request interval (in seconds)

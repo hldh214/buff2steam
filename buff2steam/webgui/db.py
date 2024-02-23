@@ -16,6 +16,7 @@ class Items():
     def __init__(self) -> None:
         self.list :list[_Item] = []
         self.latest_list = self.get_steam_decreasing
+        self.update_string = None
         self._current_item :_Item = None
         self._steam_increasing :list[_Item]= []
         self._steam_decreasing :list[_Item]= []
@@ -119,6 +120,12 @@ class Items():
 
 ##Done sorting data
 
+    def set_update_time(self, time):
+        if time == False:
+            self.update_string = "None"
+            return
+        self.update_string = f'every {time}s'
+        
     def _check_name_exists(self, market_hash_name):
         for item in self.list:
             if market_hash_name == item.market_hash_name:
