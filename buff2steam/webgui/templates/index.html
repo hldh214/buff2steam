@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>buff2steam</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <script src="https://unpkg.com/htmx.org@1.9.4"></script>
+</head>
+<section class="section">
+  <div class="columns">
+  </div>
+  <table class="table is-fullwidth">
+    <thead>
+      <tr>
+          <th>Name</th>
+          <th>Buff Price (¥)<button type="button" hx-get="/sort_buff_up" hx-target="#result">↑</button><button type="button" hx-get="/sort_buff_down" hx-target="#result">↓</button></th>
+          <th>Steam Price (¥)<button type="button" hx-get="/sort_steam_up" hx-target="#result">↑</button><button type="button" hx-get="/sort_steam_down" hx-target="#result">↓</button></th>
+          <th>Volume<button type="button" hx-get="/sort_volume_up" hx-target="#result">↑</button><button type="button" hx-get="/sort_volume_down" hx-target="#result">↓</button></th>
+          <th>Ratio<button type="button" hx-get="/sort_ratio_up" hx-target="#result">↑</button><button type="button" hx-get="/sort_ratio_down" hx-target="#result">↓</button></th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody id="result" hx-get="/refresh" hx-trigger="{{update_time}}">
+      </tbody>
+    </table>
+  </section>
+</body>
+
+</html>

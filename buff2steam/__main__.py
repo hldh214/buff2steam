@@ -4,6 +4,7 @@ import decimal
 from buff2steam import config, logger
 from buff2steam.provider.buff import Buff
 from buff2steam.provider.steam import Steam
+from buff2steam.webgui.site import items as db_items
 
 
 async def main_loop(buff, steam):
@@ -66,6 +67,7 @@ async def main_loop(buff, steam):
             visited.add(item['id'])
 
             logger.info(' '.join(result))
+            db_items.add_item(config['main']['game_appid'], market_hash_name, price_overview_data['price']/100, item["id"], buff_min_price_human, volume, current_ratio)
 
 
 async def main():
@@ -87,4 +89,5 @@ async def main():
 
 
 if __name__ == '__main__':
+    db_items.set_update_time(config['main']['webgui_refresh_time'])
     asyncio.run(main())

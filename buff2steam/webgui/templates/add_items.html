@@ -1,0 +1,10 @@
+{% for result in results %}
+<tr>
+    <td>{{ result.market_hash_name }}</td>
+    <td><a href="{{result.buff_link}}"">{{ result.buff_price }} ¥</a></td>
+    <td><a href="{{result.steam_link}}"">{{ result.steam_price }} ¥</a></td>
+    <td>{{ result.volume }}</td>
+    <td>{{ result.ratio }}</td>
+    <td> <button type="button" name="market_hash_name" hx-get="/delete_item?market_hash_name={{ result.market_hash_name }}" hx-target="#result">X</button> </td>
+</tr>
+{% endfor %}
