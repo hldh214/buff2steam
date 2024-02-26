@@ -11,6 +11,7 @@
     "webgui_refresh_time": 1
   },
   "buff": {
+    "sort_by": "sell_num.desc",
     "request_interval": 4,
     "requests_kwargs": {
       "headers": {

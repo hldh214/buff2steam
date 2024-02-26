@@ -32,7 +32,7 @@ async def main():
     buff = Buff(
         config['main']['game'],
         config['main']['game_appid'],
-        config['buff']['requests_kwargs']
+        config['buff']
     )
 
     total_page = await buff.get_total_page()

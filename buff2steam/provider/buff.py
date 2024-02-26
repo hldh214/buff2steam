@@ -21,15 +21,15 @@ class Buff:
 
     csrf_pattern = re.compile(r'name="csrf_token"\s*content="(.+?)"')
 
-    def __init__(self, game='dota2', game_appid=570, request_interval=10, request_kwargs=None):
-        if request_kwargs is None:
-            request_kwargs = {}
-
-        self.request_interval = request_interval
-        self.request_locks = {}  # {url: [asyncio.Lock, last_request_time]}
-        self.request_kwargs = request_kwargs
+    def __init__(self, game, game_appid, config):
         self.game = game
         self.game_appid = game_appid
+
+        self.request_interval = config.get('request_interval', 4)
+        self.request_kwargs = config.get('requests_kwargs', {})
+        self.sort_by = config.get('sort_by', None)
+
+        self.request_locks = {}  # {url: [asyncio.Lock, last_request_time]}
         self.opener = httpx.AsyncClient(base_url=self.base_url, **self.request_kwargs)
 
     async def __aenter__(self):
@@ -56,18 +56,23 @@ class Buff:
 
             return response.json()['data']
 
-    async def get_total_page(self):
-        response = await self.request('get', self.web_goods, params={
-            'page_num': 1,
+    def _build_web_goods_params(self, page_num):
+        params = {
+            'page_num': page_num,
             'game': self.game
-        })
+        }
+
+        if self.sort_by:
+            params['sort_by'] = self.sort_by
+
+        return params
+
+    async def get_total_page(self):
+        response = await self.request('get', self.web_goods, params=self._build_web_goods_params(1))
 
         return response.get('total_page')
 
     async def get_items(self, page):
-        response = await self.request('get', self.web_goods, params={
-            'page_num': page,
-            'game': self.game
-        })
+        response = await self.request('get', self.web_goods, params=self._build_web_goods_params(page))
 
         return response.get('items')

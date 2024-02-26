@@ -76,8 +76,7 @@ async def main():
             async with Buff(
                     game=config['main']['game'],
                     game_appid=config['main']['game_appid'],
-                    request_interval=config['buff']['request_interval'],
-                    request_kwargs=config['buff']['requests_kwargs'],
+                    config=config['buff'],
             ) as buff, Steam(
                 game_appid=config['main']['game_appid'],
                 request_interval=config['steam']['request_interval'],

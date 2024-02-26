@@ -113,6 +113,7 @@ docker run -it --name buff2steam --rm -v $PWD/config.json:/app/config.json ghcr.
     "webgui_refresh_time": 1 // update time of webgui in seconds or false, for none
   },
   "buff": {
+    "sort_by": "sell_num.desc",  // sort by Quantity (descending), Available options: null, "price.asc", "price.desc", "sell_num.desc"
     "request_interval": 4,  // buff api request interval (in seconds)
     "requests_kwargs": {
       "headers": {
