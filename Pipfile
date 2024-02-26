@@ -7,6 +7,7 @@ name = "pypi"
 httpx = "==0.*"
 loguru = "==0.*"
 tenacity = "==8.*"
+flask = "==3.*"
 
 [dev-packages]
 
