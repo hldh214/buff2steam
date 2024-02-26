@@ -3,6 +3,7 @@ import re
 import time
 
 import httpx
+import tenacity
 
 from buff2steam import logger
 from buff2steam.exceptions import BuffError
@@ -38,6 +39,11 @@ class Buff:
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self.opener.aclose()
 
+    @tenacity.retry(
+        wait=tenacity.wait_random_exponential(multiplier=1, min=8, max=60),
+        stop=tenacity.stop_after_attempt(5),
+        retry=tenacity.retry_if_exception_type(BuffError)
+    )
     async def request(self, *args, **kwargs) -> dict:
         url = kwargs.get('url', args[1])
         if url not in self.request_locks:
