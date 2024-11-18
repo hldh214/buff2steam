@@ -4,7 +4,7 @@ import csv
 import datetime
 import json
 
-import trio
+import asyncio
 
 from buff2steam.provider.buff import Buff
 
@@ -71,4 +71,4 @@ async def main():
 
 
 if __name__ == '__main__':
-    trio.run(main)
+    asyncio.run(main())
